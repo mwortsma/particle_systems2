@@ -1,9 +1,9 @@
-package tree
+package fulltree
 
 import (
 	"fmt"
-	"github.com/mwortsma/particle_systems2/matutil"
-	"github.com/mwortsma/particle_systems2/probutil"
+	"github.com/mwortsma/particle_systems2/util/matutil"
+	"github.com/mwortsma/particle_systems2/util/probutil"
 	"golang.org/x/exp/rand"
 	"time"
 )

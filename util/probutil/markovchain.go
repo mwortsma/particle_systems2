@@ -1,7 +1,7 @@
 package probutil
 
 import (
-	"github.com/mwortsma/particle_systems2/matutil"
+	"github.com/mwortsma/particle_systems2/util/matutil"
 )
 
 type InitialConditions func(matutil.Vec) float64

@@ -2,9 +2,9 @@ package local
 
 import (
 	"fmt"
-	"github.com/mwortsma/particle_systems2/mathutil"
-	"github.com/mwortsma/particle_systems2/matutil"
-	"github.com/mwortsma/particle_systems2/probutil"
+	"github.com/mwortsma/particle_systems2/util/mathutil"
+	"github.com/mwortsma/particle_systems2/util/matutil"
+	"github.com/mwortsma/particle_systems2/util/probutil"
 	"math"
 )
 

@@ -1,7 +1,7 @@
 package mathutil
 
 import (
-	"github.com/mwortsma/particle_systems2/matutil"
+	"github.com/mwortsma/particle_systems2/util/matutil"
 	"math"
 	"strconv"
 )
