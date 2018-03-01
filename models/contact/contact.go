@@ -3,6 +3,7 @@ package contact
 import 	(
   "github.com/mwortsma/particle_systems2/full/fullgraph"
   "github.com/mwortsma/particle_systems2/full/fulltree"
+  "github.com/mwortsma/particle_systems2/local"
   "github.com/mwortsma/particle_systems2/util/matutil"
   "github.com/mwortsma/particle_systems2/util/probutil"
 )
@@ -53,6 +54,16 @@ func getNeighborQ(p,q float64) probutil.NeighborTransition {
 }
 
 // Dense.
+func DenseFinalNeighborhoodDistr(
+  T int,
+  p,q float64,
+  nu probutil.InitDistr,
+  steps int,
+  n int) probutil.PathDistr {
+
+  return fullgraph.DenseFinalNeighborhoodDistr(T,getRealQ(p,q),nu,2,steps,n)
+}
+
 func DenseTimeDistr(
   T int,
   p,q float64,
@@ -75,6 +86,16 @@ func DensePathDistr(
 }
 
 // Tree
+func TreeFinalNeighborhoodDistr(
+  T int,
+  p,q float64,
+  d int,
+  nu probutil.InitDistr,
+	steps int) probutil.PathDistr {
+
+  return fulltree.FinalNeighborhoodDistr(T,d,getRealQ(p,q),nu,2,steps)
+}
+
 func TreeTimeDistr(
   T int,
   p,q float64,
@@ -96,5 +117,33 @@ func TreePathDistr(
 }
 
 // Local
+func FinalNeighborhoodDistr(
+	T int,
+	tau int,
+	d int,
+	p,q float64,
+	nu probutil.InitFunc) probutil.PathDistr {
 
-// TODO:
+  return local.FinalNeighborhoodDistr(T,tau,d,getNeighborQ(p,q),nu,2)
+}
+
+
+func TimeDistr(
+	T int,
+	tau int,
+	d int,
+	p,q float64,
+	nu probutil.InitFunc) probutil.TimeDistr {
+
+  return local.TimeDistr(T,tau,d,getNeighborQ(p,q),nu,2)
+}
+
+func PathDistr(
+	T int,
+	tau int,
+	d int,
+	p,q float64,
+	nu probutil.InitFunc) probutil.PathDistr {
+
+  return local.PathDistr(T,tau,d,getNeighborQ(p,q),nu,2)
+}

@@ -21,7 +21,7 @@ func Realization(
   d int,
   Q probutil.RealTransition,
   nu probutil.InitDistr,
-  k int) matutil.Vec {
+  k int) node {
 	// Ger random number to be used throughout
 	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
 
@@ -34,7 +34,26 @@ func Realization(
 		root.transition(t, d, Q, k, r)
 	}
 
-	return root.state
+	return root
+}
+
+func FinalNeighborhoodDistr(
+  T int,
+  d int,
+  Q probutil.RealTransition,
+  nu probutil.InitDistr,
+  k int,
+  steps int) probutil.PathDistr {
+
+	f := func() fmt.Stringer {
+		x := Realization(T, d, Q, nu, k)
+		v := []int{x.state[T-1]}
+		for _, c := range x.children {
+			v = append(v, c.state[T-1])
+		}
+		return matutil.Vec(v)
+	}
+	return probutil.GetPathDistrSync(f, steps)
 }
 
 func TimeDistr(
@@ -51,7 +70,8 @@ func TimeDistr(
 	}
 
 	f := func() ([]float64, matutil.Vec) {
-		return t_array, Realization(T, d, Q, nu, k)
+		x := Realization(T, d, Q, nu, k)
+		return t_array, x.state
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
 }
@@ -65,7 +85,8 @@ func PathDistr(
 	steps int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		return Realization(T, d, Q, nu, k)
+		x := Realization(T, d, Q, nu, k)
+		return x.state
 	}
 	return probutil.GetPathDistrSync(f, steps)
 }

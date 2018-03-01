@@ -6,6 +6,18 @@ import (
 )
 
 // Graph specific
+func DenseFinalNeighborhoodDistr(
+  T int,
+  Q probutil.RealTransition,
+  nu probutil.InitDistr,
+  k int,
+  steps int,
+  n int) probutil.PathDistr {
+
+  return FinalNeighborhoodDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
+}
+
+
 func DenseTimeDistr(
   T int,
   Q probutil.RealTransition,

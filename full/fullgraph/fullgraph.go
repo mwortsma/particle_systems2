@@ -41,6 +41,30 @@ func Realization(
 	return X
 }
 
+func FinalNeighborhoodDistr(
+  T int,
+  d int,
+  Q probutil.RealTransition,
+  nu probutil.InitDistr,
+  k int,
+  steps int,
+  G graphutil.Graph) probutil.PathDistr {
+
+	f := func() fmt.Stringer {
+    X := Realization(T, d, Q, nu, k, G)
+		v := []int{X[0][T-1]}
+		for i, j := range G[0] {
+			if i >= d {
+				break
+			}
+			v = append(v, X[j][T-1])
+		}
+		return matutil.Vec(v)
+	}
+	return probutil.GetPathDistrSync(f, steps)
+}
+
+
 func TimeDistr(
   T int,
   d int,
