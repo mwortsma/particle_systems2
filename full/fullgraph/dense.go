@@ -8,26 +8,22 @@ import (
 // Graph specific
 func DenseTimeDistr(
   T int,
-  d int,
   Q probutil.NeighborTransition,
   nu probutil.InitDistr,
   k int,
   steps int,
-  n int,
-  G graphutil.Graph) probutil.TimeDistr {
+  n int) probutil.TimeDistr {
 
-  return TimeDistr(T,d,Q,nu,k,steps,graphutil.Complete(n))
+  return TimeDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
 }
 
 func DensePathDistr(
   T int,
-  d int,
   Q probutil.NeighborTransition,
   nu probutil.InitDistr,
   k int,
   steps int,
-  n int,
-  G graphutil.Graph) probutil.PathDistr {
+  n int) probutil.PathDistr {
 
-  return PathDistr(T,d,Q,nu,k,steps,graphutil.Complete(n))
+  return PathDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
 }
