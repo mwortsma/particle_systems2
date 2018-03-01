@@ -7,7 +7,7 @@ import string
 
 parser=argparse.ArgumentParser()
 
-parser.add_argument('-keep', action='store_true')
+parser.add_argument('-keep', action='store_false')
 parser.add_argument('-show_plot', action='store_true')
 parser.add_argument('-save_plot', action='store')
 parser.add_argument('-binary_path', action='store')
