@@ -2,6 +2,7 @@ package probutil
 
 import (
 	"github.com/mwortsma/particle_systems2/util/matutil"
+	"github.com/mwortsma/particle_systems2/util/mathutil"
 )
 
 type InitFunc func(matutil.Vec) float64
@@ -26,5 +27,20 @@ func GetInitFunc(nu InitDistr) InitFunc {
 func GetNeighborTransition(G LawTransition, k int) NeighborTransition {
 	return func(s_new, s int, v matutil.Vec) float64 {
 		return G(s_new, s, Freq(v,k))
+  }
+}
+
+// Try not to call this function.
+func GetLawTransition(G NeighborTransition, k int, d int) LawTransition {
+	return func(s_new, s int, l Law) float64 {
+		prob := 0.0
+		for _, neighbors := range mathutil.QStrings(d,k) {
+			p := G(s_new, s, neighbors)
+			for _, n := range neighbors {
+				p *= l[n]
+			}
+			prob += p
+		}
+		return prob
   }
 }
