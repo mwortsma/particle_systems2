@@ -61,7 +61,8 @@ func PathDistr(
   d int,
   Q probutil.NeighborTransition,
   nu probutil.InitialConditions,
-  k int, steps int) probutil.Distr {
+  k int,
+	steps int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
 		return Realization(T, d, Q, nu, k)

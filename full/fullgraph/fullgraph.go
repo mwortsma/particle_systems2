@@ -1,79 +1,83 @@
 package fullgraph
-/*
+
 import (
 	"fmt"
-	"github.com/mwortsma/particle_systems/graphutil"
-	"github.com/mwortsma/particle_systems/matutil"
-	"github.com/mwortsma/particle_systems/probutil"
-	"golang.org/x/exp/rand"
-	"time"
+	"github.com/mwortsma/particle_systems2/util/graphutil"
+	"github.com/mwortsma/particle_systems2/util/matutil"
+	"github.com/mwortsma/particle_systems2/util/probutil"
+	//"golang.org/x/exp/rand"
+	//"time"
 )
 
-func GraphRealization(T int, p, q float64, nu float64, G graphutil.Graph) matutil.Mat {
+func Realization(
+  T int,
+  d int,
+  Q probutil.NeighborTransition,
+  nu probutil.InitialConditions,
+  k int,
+  G graphutil.Graph) matutil.Mat {
+
 	n := len(G)
 	X := matutil.Create(T, n)
 
 	// Ger random number to be used throughout
-	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
+	// r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
 
 	// Initial conditions.
 	for i := 0; i < n; i++ {
-		if r.Float64() < nu {
-			X[0][i] = 1
-		}
+		X[0][i] = 1
+    // TODO InitialConditions
 	}
 
 	for t := 1; t < T; t++ {
 		for i := 0; i < n; i++ {
 			X[t][i] = X[t-1][i]
-			if X[t-1][i] == 0 {
-				// get the sum of the neighbors
-				sum_neighbors := 0
-				for j := 0; j < len(G[i]); j++ {
-					sum_neighbors += X[t-1][G[i][j]]
-				}
-				// transition with probability (p/deg)*sum_neighbors
-				if r.Float64() < (p/float64(len(G[i])))*float64(sum_neighbors) {
-					X[t][i] = 1
-				}
-			} else {
-				// if state is 1, transition back with porbability q
-				if r.Float64() < q {
-					X[t][i] = 0
-				}
+			// get the sum of the neighbors
+			neighbors := make([]int, 0)
+			for j := 0; j < len(G[i]); j++ {
+				neighbors = append(neighbors, X[t-1][G[i][j]])
 			}
+
+      // TODO Sample from Q
+
 		}
 	}
-
 	return X
 }
 
-func RingRealization(T int, p, q float64, nu float64, n int) matutil.Mat {
-	return GraphRealization(T, p, q, nu, graphutil.Ring(n))
-}
+func TimeDistr(
+  T int,
+  d int,
+  Q probutil.NeighborTransition,
+  nu probutil.InitialConditions,
+  k int,
+  steps int,
+  G graphutil.Graph) probutil.TimeDistr {
 
-func CompleteRealization(T int, p, q float64, nu float64, n int) matutil.Mat {
-	return GraphRealization(T, p, q, nu, graphutil.Complete(n))
-}
-
-func RingTypicalDistr(T int, p, q float64, nu float64, n, steps int) probutil.Distr {
-	if n < 0 {
-		n = 1 + 2*T
+	t_array := make([]float64, T)
+	for i := 0; i < T; i++ {
+		t_array[i] = float64(i)
 	}
-	fmt.Println("Running dtcp Full Ring n =", n)
+
+	f := func() ([]float64, matutil.Vec) {
+    X := Realization(T, d, Q, nu, k, G)
+		return t_array, X.Col(0)
+	}
+	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
+}
+
+func PathDistr(
+  T int,
+  d int,
+  Q probutil.NeighborTransition,
+  nu probutil.InitialConditions,
+  k int,
+  steps int,
+  G graphutil.Graph) probutil.PathDistr {
+
 	f := func() fmt.Stringer {
-		X := RingRealization(T, p, q, nu, n)
+    X := Realization(T, d, Q, nu, k, G)
 		return X.Col(0)
 	}
-	return probutil.TypicalDistrSync(f, steps)
+	return probutil.GetPathDistrSync(f, steps)
 }
-
-func CompleteTypicalDistr(T int, p, q float64, nu float64, n, steps int) probutil.Distr {
-	fmt.Println("Running dtcp Full Complete n =", n)
-	f := func() fmt.Stringer {
-		X := CompleteRealization(T, p, q, nu, n)
-		return X.Col(0)
-	}
-	return probutil.TypicalDistrSync(f, steps)
-}
-*/
