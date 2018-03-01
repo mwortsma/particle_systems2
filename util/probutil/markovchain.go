@@ -4,8 +4,21 @@ import (
 	"github.com/mwortsma/particle_systems2/util/matutil"
 )
 
-type InitialConditions func(matutil.Vec) float64
+type InitFunc func(matutil.Vec) float64
+type InitDistr []float64
 
 type NeighborTransition func(int, int, matutil.Vec) float64
 
-// TODO: type LawTransition func(int, int, matutil.Vec) float64
+type Law []float64
+
+type LawTransition func(int, int, Law) float64
+
+func GetInitFunc(nu InitDistr) InitFunc {
+	return func(v matutil.Vec) float64 {
+		p := 1.0
+		for _, vi := range v {
+			p *= nu[vi]
+		}
+		return p
+	}
+}

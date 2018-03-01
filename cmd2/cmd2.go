@@ -1,6 +1,28 @@
 package main
 
+import (
+	"encoding/json"
+	"flag"
+	"fmt"
+  "strings"
+	//"io/ioutil"
+)
+
 func main() {
+
+  // Get initial conditions
+  var nu string
+  flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
+	flag.Parse()
+  var init []float64
+  dec := json.NewDecoder(strings.NewReader(nu))
+  err := dec.Decode(&init)
+  if err != nil {
+    fmt.Println("Nu not formatted correctly, e.g. [0.3, 0.7]")
+    return
+  }
+
+  fmt.Println(init)
 
 }
 

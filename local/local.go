@@ -116,7 +116,7 @@ func FinalNeighborhoodDistr(
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu probutil.InitialConditions,
+	nu probutil.InitFunc,
 	k int) probutil.PathDistr {
 
 	j := tauApprox(T, tau, d, Q, nu, k)
@@ -143,7 +143,7 @@ func tauApprox(
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu probutil.InitialConditions,
+	nu probutil.InitFunc,
 	k int) probutil.PathDistr {
 
 	if tau < 0 {
@@ -178,7 +178,7 @@ func TimeDistr(
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu probutil.InitialConditions,
+	nu probutil.InitFunc,
 	k int) probutil.TimeDistr {
 
 	js, _ := tauApproxForEachT(T, tau, d, Q, nu, k)
@@ -205,7 +205,7 @@ func tauApproxForEachT(
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu probutil.InitialConditions,
+	nu probutil.InitFunc,
 	k int) ([]probutil.PathDistr, []probutil.PathDistr) {
 
 	if tau < 0 {
@@ -268,7 +268,7 @@ func PathDistr(
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu probutil.InitialConditions,
+	nu probutil.InitFunc,
 	k int) probutil.PathDistr {
 
 	j_array, p_array := tauApproxForEachT(T, tau, d, Q, nu, k)

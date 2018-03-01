@@ -20,7 +20,7 @@ func Realization(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int) matutil.Vec {
 	// Ger random number to be used throughout
 	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
@@ -41,7 +41,7 @@ func TimeDistr(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int,
   steps int) probutil.TimeDistr {
 
@@ -60,7 +60,7 @@ func PathDistr(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int,
 	steps int) probutil.PathDistr {
 
@@ -74,7 +74,7 @@ func PathDistr(
 func (n *node) createNode(
 	T int,
 	d int,
-	nu probutil.InitialConditions,
+	nu probutil.InitDistr,
 	parent *node,
 	depth int,
 	is_root bool,

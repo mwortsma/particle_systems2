@@ -13,7 +13,7 @@ func Realization(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int,
   G graphutil.Graph) matutil.Mat {
 
@@ -26,7 +26,7 @@ func Realization(
 	// Initial conditions.
 	for i := 0; i < n; i++ {
 		X[0][i] = 1
-    // TODO InitialConditions
+    // TODO InitDistr
 	}
 
 	for t := 1; t < T; t++ {
@@ -49,7 +49,7 @@ func TimeDistr(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int,
   steps int,
   G graphutil.Graph) probutil.TimeDistr {
@@ -70,7 +70,7 @@ func PathDistr(
   T int,
   d int,
   Q probutil.NeighborTransition,
-  nu probutil.InitialConditions,
+  nu probutil.InitDistr,
   k int,
   steps int,
   G graphutil.Graph) probutil.PathDistr {
