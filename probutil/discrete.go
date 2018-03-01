@@ -2,14 +2,11 @@ package probutil
 
 import (
 	"fmt"
-	"math"
-	"sort"
 	"sync"
 )
 
 type Distr interface{}
-
-// TODO where is conditional used: type Conditional map[string]map[string]float64
+type Conditional map[string]map[string]float64
 type PathDistr map[string]float64
 
 func TypicalPathDistrSync(f func() fmt.Stringer, steps int) Distr {

@@ -28,7 +28,8 @@ def plot_time(distributions, labels, show, save):
 		k = d['K']
 		arr = np.array(d['Distr'])
 		for j in range(k-1):
-			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j], label=(labels[i]+" P(X="+str(j))+")")
+			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
+				label=(labels[i]+" P(X="+str(j))+")")
 	plt.legend(loc=2)
 	plt.xlabel("Time")
 	if show:
@@ -43,7 +44,8 @@ def plot_time_full(distributions, labels, show, save):
 		k = d['K']
 		arr = np.array(d['Distr'])
 		for j in range(k):
-			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j], label=(labels[i]+" P(X="+str(j))+")")
+			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
+				label=(labels[i]+" P(X="+str(j))+")")
 
 	plt.legend(loc=2)
 	if show:

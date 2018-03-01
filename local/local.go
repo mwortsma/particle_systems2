@@ -9,22 +9,30 @@ import (
 )
 
 /////////////////////////////////////////////////////////////////////
-/////					The Main Algorithm						/////
+/////									The Main Algorithm										    /////
 /////////////////////////////////////////////////////////////////////
 
-func getJoint(t, tau int, d int, Q probutil.NeighborTransition, j probutil.PathDistr, c probutil.Conditional, k int) (probutil.PathDistr, probutil.PathDistr) {
+func getJointAndTransitionKernel(
+	t int,
+	tau int,
+	d int,
+	Q probutil.NeighborTransition,
+	j probutil.PathDistr,
+	c probutil.Conditional,
+	k int) (probutil.PathDistr, probutil.PathDistr) {
+
 	fmt.Println("Obtaining joint at", t)
 
 	jnew := make(probutil.PathDistr)
 
 	p := make(probutil.PathDistr)
 
-	l := Min(tau, t) + 1
-	r := Min(tau, t-1) + 1
+	l := mathutil.Min(tau, t) + 1
+	r := mathutil.Min(tau, t-1) + 1
 
-	prev_vals := matutil.QMats(r, d+1, k)
-	new_vals := matutil.QStrings(d+1, k)
-	other_children_vals := matutil.QStrings(d-1, k)
+	prev_vals := mathutil.QMats(r, d+1, k)
+	new_vals := mathutil.QStrings(d+1, k)
+	other_children_vals := mathutil.QStrings(d-1, k)
 
 	for _, prev := range prev_vals {
 		prob_prev := j[prev.String()]
@@ -57,15 +65,20 @@ func getJoint(t, tau int, d int, Q probutil.NeighborTransition, j probutil.PathD
 	return jnew, p
 }
 
-func getConditional(t, tau int, d int, jt probutil.PathDistr, k int) probutil.Conditional {
+func getConditional(
+	t int,
+	tau int,
+	d int,
+	jt probutil.PathDistr,
+	k int) probutil.Conditional {
 	fmt.Println("Obtaining Conditional at", t)
 
 	ct := make(probutil.Conditional)
 
-	l := Min(tau, t) + 1
+	l := mathutil.Min(tau, t) + 1
 
-	history_vals := matutil.QMats(l, 2, k)
-	children_vals := matutil.QMats(l, d-1, k)
+	history_vals := mathutil.QMats(l, 2, k)
+	children_vals := mathutil.QMats(l, d-1, k)
 
 	for _, history := range history_vals {
 		hist_str := history.String()
@@ -94,13 +107,19 @@ func getConditional(t, tau int, d int, jt probutil.PathDistr, k int) probutil.Co
 }
 
 /////////////////////////////////////////////////////////////////////
-/////				Shortened, Scalable Version 				/////
+/////									  Shortened & Scalable								    /////
 /////////////////////////////////////////////////////////////////////
 
 // Gets the distriution over the local neighborhood at the end
-func DTMCRegtreeEndDistr(T, tau int, d int, Q probutil.NeighborTransition, nu func(matutil.Vec) float64, k int) probutil.PathDistr {
+func FinalNeighborhoodDistr(
+	T int,
+	tau int,
+	d int,
+	Q probutil.NeighborTransition,
+	nu probutil.InitialConditions,
+	k int) probutil.PathDistr {
 
-	j := DTMCRegtreeRecursions(T, tau, d, Q, nu, k)
+	j := tauApprox(T, tau, d, Q, nu, k)
 
 	f := make(probutil.PathDistr)
 
@@ -119,7 +138,13 @@ func DTMCRegtreeEndDistr(T, tau int, d int, Q probutil.NeighborTransition, nu fu
 }
 
 // Returns the last final joint distribution.
-func DTMCRegtreeRecursions(T, tau int, d int, Q probutil.NeighborTransition, nu func(matutil.Vec) float64, k int) probutil.PathDistr {
+func tauApprox(
+	T int,
+	tau int,
+	d int,
+	Q probutil.NeighborTransition,
+	nu probutil.InitialConditions,
+	k int) probutil.PathDistr {
 
 	if tau < 0 {
 		tau = math.MaxInt32
@@ -129,7 +154,7 @@ func DTMCRegtreeRecursions(T, tau int, d int, Q probutil.NeighborTransition, nu 
 
 	var c probutil.Conditional
 
-	for _, init := range matutil.QStrings(d+1, k) {
+	for _, init := range mathutil.QStrings(d+1, k) {
 		j[matutil.Mat([][]int{init}).String()] = nu(init)
 	}
 
@@ -137,7 +162,7 @@ func DTMCRegtreeRecursions(T, tau int, d int, Q probutil.NeighborTransition, nu 
 
 		c = getConditional(t-1, tau, d, j, k)
 
-		j, _ = getJoint(t, tau, d, Q, j, c, k)
+		j, _ = getJointAndTransitionKernel(t, tau, d, Q, j, c, k)
 
 	}
 
@@ -145,18 +170,18 @@ func DTMCRegtreeRecursions(T, tau int, d int, Q probutil.NeighborTransition, nu 
 }
 
 /////////////////////////////////////////////////////////////////////
-/////					  Full Version 				            /////
+/////									     For Every Time				    				    /////
 /////////////////////////////////////////////////////////////////////
 
-func DTMCRegtreeTDistr(
+func TimeDistr(
 	T int,
-	tau int, 
-	d int, 
-	Q probutil.NeighborTransition, 
-	nu func(matutil.Vec) float64, 
-	k int) probutil.ContDistr {
+	tau int,
+	d int,
+	Q probutil.NeighborTransition,
+	nu probutil.InitialConditions,
+	k int) probutil.TimeDistr {
 
-	js, _ := DTMCRegtreeRecursionsFull(T, tau, d, Q, nu, k)
+	js, _ := tauApproxForEachT(T, tau, d, Q, nu, k)
 
 	f := make([][]float64, T)
 	t := 0
@@ -170,16 +195,17 @@ func DTMCRegtreeTDistr(
 		t += 1
 	}
 
-	return probutil.ContDistr{1, float64(T), k, f}
+	return probutil.TimeDistr{1, float64(T), k, f}
 }
 
-// This is equivelant to DTMCRegtreeRecursions except for that returns j for all t and c for all t
-func DTMCRegtreeRecursionsFull(
+// This is equivelant to above except for that returns j
+// for all t and c for all t
+func tauApproxForEachT(
 	T int,
 	tau int,
 	d int,
 	Q probutil.NeighborTransition,
-	nu func(matutil.Vec) float64,
+	nu probutil.InitialConditions,
 	k int) ([]probutil.PathDistr, []probutil.PathDistr) {
 
 	if tau < 0 {
@@ -192,7 +218,7 @@ func DTMCRegtreeRecursionsFull(
 
 	var c probutil.Conditional
 
-	for _, init := range matutil.QStrings(d+1, k) {
+	for _, init := range mathutil.QStrings(d+1, k) {
 		j[0][matutil.Mat([][]int{init}).String()] = nu(init)
 	}
 
@@ -203,7 +229,7 @@ func DTMCRegtreeRecursionsFull(
 
 		c = getConditional(t-1, tau, d, j[t-1], k)
 
-		j[t], p[t] = getJoint(t, tau, d, Q, j[t-1], c, k)
+		j[t], p[t] = getJointAndTransitionKernel(t, tau, d, Q, j[t-1], c, k)
 
 	}
 
@@ -212,15 +238,18 @@ func DTMCRegtreeRecursionsFull(
 	return j, p
 }
 
-// Untested
-func JointProb(
+/////////////////////////////////////////////////////////////////////
+/////									     For Path Distr				    				    /////
+/////////////////////////////////////////////////////////////////////
+
+func fullPathProbability(
 	T int,
 	tau int,
 	d int,
 	j []probutil.PathDistr,
 	p []probutil.PathDistr,
 	state matutil.Mat) float64 {
-	
+
 	prob := 1.0
 	t := T - 1
 	for len(state) > tau+1 {
@@ -234,9 +263,15 @@ func JointProb(
 
 }
 
-func FullRun(T, tau int, d int, Q probutil.NeighborTransition, nu func(matutil.Vec) float64, k int) probutil.PathDistr {
+func PathDistr(
+	T int,
+	tau int,
+	d int,
+	Q probutil.NeighborTransition,
+	nu probutil.InitialConditions,
+	k int) probutil.PathDistr {
 
-	j_array, p_array := DTMCRegtreeRecursionsFull(T, tau, d, Q, nu, k)
+	j_array, p_array := tauApproxForEachT(T, tau, d, Q, nu, k)
 
 	f := make(probutil.PathDistr)
 
@@ -244,13 +279,13 @@ func FullRun(T, tau int, d int, Q probutil.NeighborTransition, nu func(matutil.V
 		tau = math.MaxInt32
 	}
 
-	states := matutil.QMats(T, d+1, k)
+	states := mathutil.QMats(T, d+1, k)
 	for _, state := range states {
 		path := state.Col(0).String()
 		if _, ok := f[path]; !ok {
 			f[path] = 0.0
 		}
-		f[path] += JointProb(T, tau, d, j_array, p_array, state)
+		f[path] += fullPathProbability(T, tau, d, j_array, p_array, state)
 	}
 
 	return f

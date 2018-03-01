@@ -2,7 +2,6 @@ package probutil
 
 import (
 	"github.com/mwortsma/particle_systems2/matutil"
-	"math"
 	"sync"
 )
 
@@ -18,7 +17,7 @@ func TypicalTimeDistrSync(
 	dt float64,
 	T float64,
 	k int,
-	steps int) ContDistr {
+	steps int) TimeDistr {
 
 	length := int(float64(T) / dt)
 	cdistr := make([][]float64, length)
@@ -51,7 +50,7 @@ func TypicalTimeDistrSync(
 		}()
 	}
 	wg.Wait()
-	return ContDistr{dt, T, k, cdistr}
+	return TimeDistr{dt, T, k, cdistr}
 }
 
 func TypicalTimeDistr(
@@ -59,7 +58,7 @@ func TypicalTimeDistr(
 	dt float64,
 	T float64,
 	k int,
-	steps int) ContDistr {
+	steps int) TimeDistr {
 
 	length := int(float64(T) / dt)
 	cdistr := make([][]float64, length)
@@ -86,5 +85,5 @@ func TypicalTimeDistr(
 
 	}
 
-	return ContDistr{dt, T, k, cdistr}
+	return TimeDistr{dt, T, k, cdistr}
 }

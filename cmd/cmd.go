@@ -1,5 +1,10 @@
 package main
 
+func main() {
+
+}
+
+/*
 import (
 	"encoding/json"
 	"flag"
@@ -95,3 +100,4 @@ func main() {
 	}
 
 }
+*/
