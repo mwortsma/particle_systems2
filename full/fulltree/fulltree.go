@@ -19,7 +19,7 @@ type node struct {
 func Realization(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int) matutil.Vec {
 	// Ger random number to be used throughout
@@ -40,7 +40,7 @@ func Realization(
 func TimeDistr(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   steps int) probutil.TimeDistr {
@@ -59,7 +59,7 @@ func TimeDistr(
 func PathDistr(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
 	steps int) probutil.PathDistr {
@@ -109,11 +109,9 @@ func (n *node) createNode(
 func (n *node) transition(
   t int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   k int,
   r *rand.Rand) {
-
-	n.state[t] = n.state[t-1]
 
   neighbors := make([]int, 0)
   if !n.is_root {
@@ -123,7 +121,7 @@ func (n *node) transition(
     neighbors = append(neighbors, c.state[t-1])
   }
 
-  // TODO Sample from Q
+  n.state[t] = Q(n.state[t-1], neighbors, r.Float64())
 
 	// call transition on children
 	for _, c := range n.children {

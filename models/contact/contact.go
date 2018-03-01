@@ -3,6 +3,7 @@ package contact
 import 	(
   "github.com/mwortsma/particle_systems2/full/fullgraph"
   "github.com/mwortsma/particle_systems2/full/fulltree"
+  "github.com/mwortsma/particle_systems2/util/matutil"
   "github.com/mwortsma/particle_systems2/util/probutil"
 )
 
@@ -23,7 +24,27 @@ func getLawQ(p,q float64) probutil.LawTransition {
   				return 1-p*f[1]
   			}
   		}
-  		return 0.0
+  	}
+}
+
+func getRealQ(p,q float64) probutil.RealTransition {
+  // transition from s to s_new
+  return func(prev int, neighbors matutil.Vec, r float64) int {
+  		if prev == 1 {
+        // transition back with probability q
+  			if r < q {
+  				return 0
+  			} else {
+  				return 1
+  			}
+  		} else {
+  			f := probutil.Freq(neighbors, 2)
+        if r < p*f[1] {
+          return 1
+        } else {
+          return 0
+        }
+  		}
   	}
 }
 
@@ -39,7 +60,7 @@ func DenseTimeDistr(
   steps int,
   n int) probutil.TimeDistr {
 
-  return fullgraph.DenseTimeDistr(T,getNeighborQ(p,q),nu,2,steps,n)
+  return fullgraph.DenseTimeDistr(T,getRealQ(p,q),nu,2,steps,n)
 
 }
 
@@ -50,7 +71,7 @@ func DensePathDistr(
   steps int,
   n int) probutil.PathDistr {
 
-  return fullgraph.DensePathDistr(T,getNeighborQ(p,q),nu,2,steps,n)
+  return fullgraph.DensePathDistr(T,getRealQ(p,q),nu,2,steps,n)
 }
 
 // Tree
@@ -61,7 +82,7 @@ func TreeTimeDistr(
   nu probutil.InitDistr,
 	steps int) probutil.TimeDistr {
 
-  return fulltree.TimeDistr(T,d,getNeighborQ(p,q),nu,2,steps)
+  return fulltree.TimeDistr(T,d,getRealQ(p,q),nu,2,steps)
 }
 
 func TreePathDistr(
@@ -71,7 +92,9 @@ func TreePathDistr(
   nu probutil.InitDistr,
 	steps int) probutil.PathDistr {
 
-  return fulltree.PathDistr(T,d,getNeighborQ(p,q),nu,2,steps)
+  return fulltree.PathDistr(T,d,getRealQ(p,q),nu,2,steps)
 }
 
 // Local
+
+// TODO:

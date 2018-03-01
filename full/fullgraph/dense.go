@@ -8,7 +8,7 @@ import (
 // Graph specific
 func DenseTimeDistr(
   T int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   steps int,
@@ -19,7 +19,7 @@ func DenseTimeDistr(
 
 func DensePathDistr(
   T int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   steps int,

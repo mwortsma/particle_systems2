@@ -12,7 +12,7 @@ import (
 func Realization(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   G graphutil.Graph) matutil.Mat {
@@ -30,15 +30,12 @@ func Realization(
 
 	for t := 1; t < T; t++ {
 		for i := 0; i < n; i++ {
-			X[t][i] = X[t-1][i]
 			// get the sum of the neighbors
 			neighbors := make([]int, 0)
 			for j := 0; j < len(G[i]); j++ {
 				neighbors = append(neighbors, X[t-1][G[i][j]])
 			}
-
-      // TODO Sample from Q
-
+      X[t][i] = Q(X[t][i-1], neighbors, r.Float64())
 		}
 	}
 	return X
@@ -47,7 +44,7 @@ func Realization(
 func TimeDistr(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   steps int,
@@ -68,7 +65,7 @@ func TimeDistr(
 func PathDistr(
   T int,
   d int,
-  Q probutil.NeighborTransition,
+  Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
   steps int,

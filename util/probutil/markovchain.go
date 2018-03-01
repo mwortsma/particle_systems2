@@ -14,6 +14,8 @@ type Law []float64
 
 type LawTransition func(int, int, Law) float64
 
+type RealTransition func(int, matutil.Vec, float64) int
+
 func GetInitFunc(nu InitDistr) InitFunc {
 	return func(v matutil.Vec) float64 {
 		p := 1.0
