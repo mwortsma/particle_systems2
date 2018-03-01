@@ -12,7 +12,7 @@ type TimeDistr struct {
 	Distr [][]float64
 }
 
-func TypicalTimeDistrSync(
+func GetTimeDistrSync(
 	f func() ([]float64, matutil.Vec),
 	dt float64,
 	T float64,
@@ -53,7 +53,7 @@ func TypicalTimeDistrSync(
 	return TimeDistr{dt, T, k, cdistr}
 }
 
-func TypicalTimeDistr(
+func GetTimeDistr(
 	f func() ([]float64, matutil.Vec),
 	dt float64,
 	T float64,
