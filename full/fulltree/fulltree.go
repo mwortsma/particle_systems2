@@ -103,8 +103,7 @@ func (n *node) createNode(
 	}
 	// create state
 	n.state = make(matutil.Vec, T)
-
-	// TODO initial conditions
+	n.state[0] = probutil.Sample(nu, r.Float64())
 }
 
 func (n *node) transition(

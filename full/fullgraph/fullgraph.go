@@ -5,8 +5,8 @@ import (
 	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
-	//"golang.org/x/exp/rand"
-	//"time"
+	"golang.org/x/exp/rand"
+	"time"
 )
 
 func Realization(
@@ -21,12 +21,11 @@ func Realization(
 	X := matutil.Create(T, n)
 
 	// Ger random number to be used throughout
-	// r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
+	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
 
 	// Initial conditions.
 	for i := 0; i < n; i++ {
-		X[0][i] = 1
-    // TODO InitDistr
+		X[0][i] = probutil.Sample(nu, r.Float64())
 	}
 
 	for t := 1; t < T; t++ {

@@ -22,3 +22,9 @@ func GetInitFunc(nu InitDistr) InitFunc {
 		return p
 	}
 }
+
+func GetNeighborTransition(G LawTransition, k int) NeighborTransition {
+	return func(s_new, s int, v matutil.Vec) float64 {
+		return G(s_new, s, Freq(v,k))
+  }
+}
