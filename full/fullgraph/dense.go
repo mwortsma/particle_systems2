@@ -12,9 +12,10 @@ func DenseFinalNeighborhoodDistr(
   nu probutil.InitDistr,
   k int,
   steps int,
-  n int) probutil.PathDistr {
+  n int,
+	d int) probutil.PathDistr {
 
-  return FinalNeighborhoodDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
+  return FinalNeighborhoodDistr(T,d,Q,nu,k,steps,graphutil.Complete(n))
 }
 
 

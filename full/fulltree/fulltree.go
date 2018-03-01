@@ -21,13 +21,17 @@ func Realization(
   d int,
   Q probutil.RealTransition,
   nu probutil.InitDistr,
-  k int) node {
+  k int,
+	depth int) node {
 	// Ger random number to be used throughout
 	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
 
+	if depth < 0 {
+		depth = T-1
+	}
 	// create tree
 	var root node
-	root.createNode(T, d, nu, &node{}, T-1, true, r)
+	root.createNode(T, d, nu, &node{}, depth, true, r)
 
 	for t := 1; t < T; t++ {
 		// transition will be called for the whole tree recursively
@@ -43,10 +47,11 @@ func FinalNeighborhoodDistr(
   Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
-  steps int) probutil.PathDistr {
+  steps int,
+	depth int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		x := Realization(T, d, Q, nu, k)
+		x := Realization(T, d, Q, nu, k, depth)
 		v := []int{x.state[T-1]}
 		for _, c := range x.children {
 			v = append(v, c.state[T-1])
@@ -62,7 +67,8 @@ func TimeDistr(
   Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
-  steps int) probutil.TimeDistr {
+  steps int,
+	depth int) probutil.TimeDistr {
 
 	t_array := make([]float64, T)
 	for i := 0; i < T; i++ {
@@ -70,7 +76,7 @@ func TimeDistr(
 	}
 
 	f := func() ([]float64, matutil.Vec) {
-		x := Realization(T, d, Q, nu, k)
+		x := Realization(T, d, Q, nu, k, depth)
 		return t_array, x.state
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
@@ -82,10 +88,11 @@ func PathDistr(
   Q probutil.RealTransition,
   nu probutil.InitDistr,
   k int,
-	steps int) probutil.PathDistr {
+	steps int,
+	depth int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		x := Realization(T, d, Q, nu, k)
+		x := Realization(T, d, Q, nu, k, depth)
 		return x.state
 	}
 	return probutil.GetPathDistrSync(f, steps)

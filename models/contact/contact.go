@@ -59,9 +59,10 @@ func DenseFinalNeighborhoodDistr(
   p,q float64,
   nu probutil.InitDistr,
   steps int,
-  n int) probutil.PathDistr {
+  n int,
+  d int) probutil.PathDistr {
 
-  return fullgraph.DenseFinalNeighborhoodDistr(T,getRealQ(p,q),nu,2,steps,n)
+  return fullgraph.DenseFinalNeighborhoodDistr(T,getRealQ(p,q),nu,2,steps,n,d)
 }
 
 func DenseTimeDistr(
@@ -91,9 +92,10 @@ func TreeFinalNeighborhoodDistr(
   p,q float64,
   d int,
   nu probutil.InitDistr,
-	steps int) probutil.PathDistr {
+	steps int,
+  depth int) probutil.PathDistr {
 
-  return fulltree.FinalNeighborhoodDistr(T,d,getRealQ(p,q),nu,2,steps)
+  return fulltree.FinalNeighborhoodDistr(T,d,getRealQ(p,q),nu,2,steps, depth)
 }
 
 func TreeTimeDistr(
@@ -101,9 +103,10 @@ func TreeTimeDistr(
   p,q float64,
   d int,
   nu probutil.InitDistr,
-	steps int) probutil.TimeDistr {
+	steps int,
+  depth int) probutil.TimeDistr {
 
-  return fulltree.TimeDistr(T,d,getRealQ(p,q),nu,2,steps)
+  return fulltree.TimeDistr(T,d,getRealQ(p,q),nu,2,steps, depth)
 }
 
 func TreePathDistr(
@@ -111,13 +114,14 @@ func TreePathDistr(
   p,q float64,
   d int,
   nu probutil.InitDistr,
-	steps int) probutil.PathDistr {
+	steps int,
+  depth int) probutil.PathDistr {
 
-  return fulltree.PathDistr(T,d,getRealQ(p,q),nu,2,steps)
+  return fulltree.PathDistr(T,d,getRealQ(p,q),nu,2,steps,depth)
 }
 
 // Local
-func FinalNeighborhoodDistr(
+func LocalFinalNeighborhoodDistr(
 	T int,
 	tau int,
 	d int,
@@ -128,7 +132,7 @@ func FinalNeighborhoodDistr(
 }
 
 
-func TimeDistr(
+func LocalTimeDistr(
 	T int,
 	tau int,
 	d int,
@@ -138,7 +142,7 @@ func TimeDistr(
   return local.TimeDistr(T,tau,d,getNeighborQ(p,q),nu,2)
 }
 
-func PathDistr(
+func LocalPathDistr(
 	T int,
 	tau int,
 	d int,

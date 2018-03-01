@@ -5,15 +5,19 @@ import (
 	"flag"
 	"fmt"
   "strings"
-	//"io/ioutil"
+	"io/ioutil"
+	"github.com/mwortsma/particle_systems2/util/probutil"
+	"github.com/mwortsma/particle_systems2/models/contact"
+
+
 )
 
 func main() {
 
-  // Get initial conditions
+  // Get initial conditions.
   var nu string
   flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
-	flag.Parse()
+
   var init []float64
   dec := json.NewDecoder(strings.NewReader(nu))
   err := dec.Decode(&init)
@@ -21,91 +25,64 @@ func main() {
     fmt.Println("Nu not formatted correctly, e.g. [0.3, 0.7]")
     return
   }
+	init_f := probutil.GetInitFunc(init)
 
-  fmt.Println(init)
+	// File
+	var file_str string
+	flag.StringVar(&file_str, "file", "", "save location")
 
-}
-
-/*
-import (
-	"encoding/json"
-	"flag"
-	"fmt"
-	"io/ioutil"
-)
-
-func main() {
-
-	// TODO: Clean
-
-	dtpp_rec := flag.Bool("dtpp_rec", false, "rec")
-	dtpp_mcmc_byt := flag.Bool("dtpp_mcmc_byt", false, "rec")
-	dtpp_mcmc_end := flag.Bool("dtpp_mcmc_end", false, "rec")
-	dtpp_rec_end := flag.Bool("dtpp_rec_end", false, "rec")
-	dtpp_rec_full_end := flag.Bool("dtpp_rec_full_end", false, "rec")
-	dtsir_rec := flag.Bool("dtsir_rec", false, "...")
-	dtsir_rec_full := flag.Bool("dtsir_rec_full", false, "...")
-	dtsir_rec_end := flag.Bool("dtsir_rec_end", false, "---")
-	dtsir_full_continuous := flag.Bool("dtsir_full_continuous", false, "---")
-	dtsir_full_tree := flag.Bool("dtsir_full_tree", false, "---")
-	dtsir_full_end := flag.Bool("dtsir_full_end", false, "---")
-
-	d := flag.Int("d", 2, "degree of a noe")
-	n := flag.Int("n", 10, "number of nodes")
-	k := flag.Int("k", 3, "states")
-	T := flag.Int("T", 2, "time horizon. T>0")
-	beta := flag.Float64("beta", 1.5, "temp inverse")
+	// Params
+	d := flag.Int("d", -1, "degree of a noe")
+	n := flag.Int("n", -1, "number of nodes")
+	// k := flag.Int("k", -1, "states")
+	T := flag.Int("T", -1, "time horizon. T>0")
+	depth := flag.Int("T", -1, "time horizon. T>0")
+	// beta := flag.Float64("beta", 1.5, "temp inverse")
 	tau := flag.Int("tau", -1, "how many steps to look back")
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
+	steps := flag.Int("steps", -1, "for estimating probability")
 
-	steps := flag.Int("steps", 2, "steps")
+	// Contact process
+	contact_dense_path := flag.Bool("contact_dense_path", false, "")
+	contact_dense_time := flag.Bool("contact_dense_time", false, "")
+	contact_dense_end := flag.Bool("contact_dense_end", false, "")
 
-	init := []float64{0.8, 0.2, 0}
+	contact_tree_path := flag.Bool("contact_tree_path", false, "")
+	contact_tree_time := flag.Bool("contact_tree_time", false, "")
+	contact_tree_end := flag.Bool("contact_tree_end", false, "")
 
-	var file_str string
-	flag.StringVar(&file_str, "file", "", "where to save the distribution.")
+	contact_local_path := flag.Bool("contact_local_path", false, "")
+	contact_local_time := flag.Bool("contact_local_time", false, "")
+	contact_local_end := flag.Bool("contact_local_end", false, "")
 
-	flag.Parse()
-
-	var distr probutil.GenDistr
+  flag.Parse()
+	var distr probutil.Distr
 
 	switch {
 
-	case *dtpp_rec:
-		distr = dtpp_local.Run(*T, *tau, *d, *beta, *k, *n)
+	// Contact Process
+	case *contact_dense_path:
+		distr = contact.DensePathDistr(*T,*p,*q,init,*steps,*n)
+	case *contact_dense_time:
+		distr = contact.DenseTimeDistr(*T,*p,*q,init,*steps,*n)
+	case *contact_dense_end:
+		distr = contact.DenseFinalNeighborhoodDistr(*T,*p,*q,init,*steps,*n,*d)
 
-	case *dtpp_mcmc_byt:
-		distr = dtpp_local.MCMC_byt(*T, *tau, *d, *beta, *k, *n, *steps)
-	case *dtpp_mcmc_end:
-		distr = dtpp_local.MCMC_end(*T, *tau, *d, *beta, *k, *n, *steps)
+	case *contact_tree_path:
+		distr = contact.TreePathDistr(*T,*p,*q,*d,init,*steps,*depth)
+	case *contact_tree_time:
+		distr = contact.TreeTimeDistr(*T,*p,*q,*d,init,*steps,*depth)
+	case *contact_tree_end:
+		distr = contact.TreeFinalNeighborhoodDistr(*T,*p,*q,*d,init,*steps,*depth)
 
-	case *dtpp_rec_end:
-		distr = dtpp_local.EndRun(*T, *tau, *d, *beta, *k, *n)
-	case *dtpp_rec_full_end:
-		distr = dtpp_local.FullEndRun(*T, *tau, *d, *beta, *k, *n)
-
-	case *dtsir_full_tree:
-		distr = dtsir_full.RegTreeTypicalDistr(*T, *d, *p, *q, init, *steps)
-
-	case *dtsir_full_continuous:
-		distr = dtsir_full.RegTreeTDistr(*T, *d, *p, *q, init, *steps)
-
-	case *dtsir_full_end:
-		distr = dtsir_full.RegTreeEndDistr(*T, *d, *p, *q, init, *steps)
-
-	case *dtsir_rec_full:
-		distr = dtsir_local.FullRun(*T, *tau, *d, *p, *q, init)
-
-	case *dtsir_rec:
-		distr = dtsir_local.Run(*T, *tau, *d, *p, *q, init)
-
-	case *dtsir_rec_end:
-		distr = dtsir_local.EndRun(*T, *tau, *d, *p, *q, init)
-
+	case *contact_local_path:
+		distr = contact.LocalPathDistr(*T,*tau,*d,*p,*q,init_f)
+	case *contact_local_time:
+		distr = contact.LocalTimeDistr(*T,*tau,*d,*p,*q,init_f)
+	case *contact_local_end:
+		distr = contact.LocalFinalNeighborhoodDistr(*T,*tau,*d,*p,*q,init_f)
 	}
-
-	fmt.Println(distr)
 
 	b, err := json.Marshal(distr)
 	if err != nil {
@@ -120,6 +97,4 @@ func main() {
 			panic(err)
 		}
 	}
-
 }
-*/
