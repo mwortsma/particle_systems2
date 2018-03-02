@@ -88,13 +88,12 @@ func getConditional(
 			full := matutil.Concat(history, children)
 			denom += jt[full.String()]
 		}
-		// Important
+		// New Feature: Blank for unobserved
 		if denom == 0 {
 			continue
 		}
 		for _, children := range children_vals {
 			lastrow := matutil.Vec(children[l-1]).String()
-			// TODO: debug
 			if _, ok := ct[hist_str][lastrow]; !ok {
 				ct[hist_str][lastrow] = 0
 			}
@@ -272,7 +271,7 @@ func PathDistr(
 	k int) probutil.PathDistr {
 
 	j_array, p_array := tauApproxForEachT(T, tau, d, Q, nu, k)
-	
+
 	f := make(probutil.PathDistr)
 
 	if tau < 0 {
