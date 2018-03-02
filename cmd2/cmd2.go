@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/mwortsma/particle_systems2/models/contact"
+	"github.com/mwortsma/particle_systems2/models/sir"
 	"github.com/mwortsma/particle_systems2/util/probutil"
 	"io/ioutil"
 	"strings"
@@ -49,6 +50,23 @@ func main() {
 	contact_meanfield_time := flag.Bool("contact_meanfield_time", false, "")
 	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
 
+	// SIR process
+	sir_dense_path := flag.Bool("sir_dense_path", false, "")
+	sir_dense_time := flag.Bool("sir_dense_time", false, "")
+	sir_dense_end := flag.Bool("sir_dense_end", false, "")
+
+	sir_tree_path := flag.Bool("sir_tree_path", false, "")
+	sir_tree_time := flag.Bool("sir_tree_time", false, "")
+	sir_tree_end := flag.Bool("sir_tree_end", false, "")
+
+	sir_local_path := flag.Bool("sir_local_path", false, "")
+	sir_local_time := flag.Bool("sir_local_time", false, "")
+	sir_local_end := flag.Bool("sir_local_end", false, "")
+
+	sir_meanfield_path := flag.Bool("sir_meanfield_path", false, "")
+	sir_meanfield_time := flag.Bool("sir_meanfield_time", false, "")
+	sir_meanfield_end := flag.Bool("sir_meanfield_end", false, "")
+
 	flag.Parse()
 
 	var init []float64
@@ -92,9 +110,36 @@ func main() {
 		distr = contact.MeanFieldTimeDistr(*T, *p, *q, init)
 	case *contact_meanfield_end:
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
-	}
 
-	fmt.Println(distr)
+	// Contact Process
+	case *sir_dense_path:
+		distr = sir.DensePathDistr(*T, *p, *q, init, *steps, *n)
+	case *sir_dense_time:
+		distr = sir.DenseTimeDistr(*T, *p, *q, init, *steps, *n)
+	case *sir_dense_end:
+		distr = sir.DenseFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *n, *d)
+
+	case *sir_tree_path:
+		distr = sir.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
+	case *sir_tree_time:
+		distr = sir.TreeTimeDistr(*T, *p, *q, *d, init, *steps, *depth)
+	case *sir_tree_end:
+		distr = sir.TreeFinalNeighborhoodDistr(*T, *p, *q, *d, init, *steps, *depth)
+
+	case *sir_local_path:
+		distr = sir.LocalPathDistr(*T, *tau, *d, *p, *q, init_f)
+	case *sir_local_time:
+		distr = sir.LocalTimeDistr(*T, *tau, *d, *p, *q, init_f)
+	case *sir_local_end:
+		distr = sir.LocalFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
+
+	case *sir_meanfield_path:
+		distr = sir.MeanFieldPathDistr(*T, *p, *q, init)
+	case *sir_meanfield_time:
+		distr = sir.MeanFieldTimeDistr(*T, *p, *q, init)
+	case *sir_meanfield_end:
+		distr = sir.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
+	}
 
 	b, err := json.Marshal(distr)
 	if err != nil {
