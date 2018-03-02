@@ -94,6 +94,8 @@ func main() {
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 	}
 
+	fmt.Println(distr)
+
 	b, err := json.Marshal(distr)
 	if err != nil {
 		panic(err)

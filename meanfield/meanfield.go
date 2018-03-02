@@ -46,7 +46,7 @@ func FinalNeighborhoodDistr(
 
 	distr := make(probutil.PathDistr)
 
-	for _, v := range mathutil.QStrings(d,k) {
+	for _, v := range mathutil.QStrings(d+1,k) {
     prob := 1.0
     for _, vi := range v {
       prob *= f[vi]

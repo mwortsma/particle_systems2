@@ -57,7 +57,7 @@ func FinalNeighborhoodDistr(
 			if i >= d {
 				break
 			}
-			v = append(v, X[j][T-1])
+			v = append(v, X[T-1][j])
 		}
 		return matutil.Vec(v)
 	}
