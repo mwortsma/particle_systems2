@@ -18,15 +18,6 @@ func main() {
   var nu string
   flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
 
-  var init []float64
-  dec := json.NewDecoder(strings.NewReader(nu))
-  err := dec.Decode(&init)
-  if err != nil {
-    fmt.Println("Nu not formatted correctly, e.g. [0.3, 0.7]")
-    return
-  }
-	init_f := probutil.GetInitFunc(init)
-
 	// File
 	var file_str string
 	flag.StringVar(&file_str, "file", "", "save location")
@@ -36,7 +27,7 @@ func main() {
 	n := flag.Int("n", -1, "number of nodes")
 	// k := flag.Int("k", -1, "states")
 	T := flag.Int("T", -1, "time horizon. T>0")
-	depth := flag.Int("T", -1, "time horizon. T>0")
+	depth := flag.Int("depth", -1, "time horizon. T>0")
 	// beta := flag.Float64("beta", 1.5, "temp inverse")
 	tau := flag.Int("tau", -1, "how many steps to look back")
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
@@ -57,6 +48,17 @@ func main() {
 	contact_local_end := flag.Bool("contact_local_end", false, "")
 
   flag.Parse()
+
+	var init []float64
+	dec := json.NewDecoder(strings.NewReader(nu))
+	err := dec.Decode(&init)
+	if err != nil {
+		fmt.Println("Nu not formatted correctly, e.g. [0.3, 0.7]")
+		return
+	}
+	init_f := probutil.GetInitFunc(init)
+
+
 	var distr probutil.Distr
 
 	switch {

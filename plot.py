@@ -9,7 +9,7 @@ def get_keys(distributions):
 				if k not in d2: d2[k] = 0
 	return sorted(distributions[0].keys())
 
-def plot_paths(distributions, labels, show, save):
+def plot_path(distributions, labels, show, save):
 	keys = get_keys(distributions)
 	for i in range(len(distributions)):
 		d = distributions[i]
