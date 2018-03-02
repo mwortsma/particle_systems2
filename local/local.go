@@ -272,7 +272,7 @@ func PathDistr(
 	k int) probutil.PathDistr {
 
 	j_array, p_array := tauApproxForEachT(T, tau, d, Q, nu, k)
-
+	
 	f := make(probutil.PathDistr)
 
 	if tau < 0 {

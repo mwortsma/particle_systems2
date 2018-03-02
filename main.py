@@ -21,7 +21,7 @@ parser.add_argument('-type', action='store')
 args=parser.parse_args()
 
 # Commands
-commands = [] if args.commands is None else args.commands.split(",")
+commands = [] if args.commands is None else args.commands.split("|")
 commands = [c.strip() for c in commands]
 
 # Lables
