@@ -35,7 +35,7 @@ func Realization(
 			for j := 0; j < len(G[i]); j++ {
 				neighbors = append(neighbors, X[t-1][G[i][j]])
 			}
-			X[t][i] = Q(X[t][i-1], neighbors, r.Float64())
+			X[t][i] = Q(X[t-1][i], neighbors, r.Float64())
 		}
 	}
 	return X
