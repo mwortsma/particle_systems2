@@ -5,10 +5,10 @@ import (
 )
 
 func Freq(v matutil.Vec, k int) Law {
-  s := make([]float64, k)
-  denom := float64(len(v))
-  for _, vi := range v {
-    s[vi] += 1.0/denom
-  }
-  return s
+	s := make([]float64, k)
+	denom := float64(len(v))
+	for _, vi := range v {
+		s[vi] += 1.0 / denom
+	}
+	return s
 }

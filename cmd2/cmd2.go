@@ -4,19 +4,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-  "strings"
-	"io/ioutil"
-	"github.com/mwortsma/particle_systems2/util/probutil"
 	"github.com/mwortsma/particle_systems2/models/contact"
-
-
+	"github.com/mwortsma/particle_systems2/util/probutil"
+	"io/ioutil"
+	"strings"
 )
 
 func main() {
 
-  // Get initial conditions.
-  var nu string
-  flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
+	// Get initial conditions.
+	var nu string
+	flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
 
 	// File
 	var file_str string
@@ -47,7 +45,7 @@ func main() {
 	contact_local_time := flag.Bool("contact_local_time", false, "")
 	contact_local_end := flag.Bool("contact_local_end", false, "")
 
-  flag.Parse()
+	flag.Parse()
 
 	var init []float64
 	dec := json.NewDecoder(strings.NewReader(nu))
@@ -58,32 +56,31 @@ func main() {
 	}
 	init_f := probutil.GetInitFunc(init)
 
-
 	var distr probutil.Distr
 
 	switch {
 
 	// Contact Process
 	case *contact_dense_path:
-		distr = contact.DensePathDistr(*T,*p,*q,init,*steps,*n)
+		distr = contact.DensePathDistr(*T, *p, *q, init, *steps, *n)
 	case *contact_dense_time:
-		distr = contact.DenseTimeDistr(*T,*p,*q,init,*steps,*n)
+		distr = contact.DenseTimeDistr(*T, *p, *q, init, *steps, *n)
 	case *contact_dense_end:
-		distr = contact.DenseFinalNeighborhoodDistr(*T,*p,*q,init,*steps,*n,*d)
+		distr = contact.DenseFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *n, *d)
 
 	case *contact_tree_path:
-		distr = contact.TreePathDistr(*T,*p,*q,*d,init,*steps,*depth)
+		distr = contact.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
 	case *contact_tree_time:
-		distr = contact.TreeTimeDistr(*T,*p,*q,*d,init,*steps,*depth)
+		distr = contact.TreeTimeDistr(*T, *p, *q, *d, init, *steps, *depth)
 	case *contact_tree_end:
-		distr = contact.TreeFinalNeighborhoodDistr(*T,*p,*q,*d,init,*steps,*depth)
+		distr = contact.TreeFinalNeighborhoodDistr(*T, *p, *q, *d, init, *steps, *depth)
 
 	case *contact_local_path:
-		distr = contact.LocalPathDistr(*T,*tau,*d,*p,*q,init_f)
+		distr = contact.LocalPathDistr(*T, *tau, *d, *p, *q, init_f)
 	case *contact_local_time:
-		distr = contact.LocalTimeDistr(*T,*tau,*d,*p,*q,init_f)
+		distr = contact.LocalTimeDistr(*T, *tau, *d, *p, *q, init_f)
 	case *contact_local_end:
-		distr = contact.LocalFinalNeighborhoodDistr(*T,*tau,*d,*p,*q,init_f)
+		distr = contact.LocalFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
 	}
 
 	b, err := json.Marshal(distr)

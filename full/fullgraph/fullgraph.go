@@ -10,12 +10,12 @@ import (
 )
 
 func Realization(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  G graphutil.Graph) matutil.Mat {
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	G graphutil.Graph) matutil.Mat {
 
 	n := len(G)
 	X := matutil.Create(T, n)
@@ -35,23 +35,23 @@ func Realization(
 			for j := 0; j < len(G[i]); j++ {
 				neighbors = append(neighbors, X[t-1][G[i][j]])
 			}
-      X[t][i] = Q(X[t][i-1], neighbors, r.Float64())
+			X[t][i] = Q(X[t][i-1], neighbors, r.Float64())
 		}
 	}
 	return X
 }
 
 func FinalNeighborhoodDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  G graphutil.Graph) probutil.PathDistr {
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	G graphutil.Graph) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-    X := Realization(T, d, Q, nu, k, G)
+		X := Realization(T, d, Q, nu, k, G)
 		v := []int{X[0][T-1]}
 		for i, j := range G[0] {
 			if i >= d {
@@ -64,15 +64,14 @@ func FinalNeighborhoodDistr(
 	return probutil.GetPathDistrSync(f, steps)
 }
 
-
 func TimeDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  G graphutil.Graph) probutil.TimeDistr {
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	G graphutil.Graph) probutil.TimeDistr {
 
 	t_array := make([]float64, T)
 	for i := 0; i < T; i++ {
@@ -80,23 +79,23 @@ func TimeDistr(
 	}
 
 	f := func() ([]float64, matutil.Vec) {
-    X := Realization(T, d, Q, nu, k, G)
+		X := Realization(T, d, Q, nu, k, G)
 		return t_array, X.Col(0)
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
 }
 
 func PathDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  G graphutil.Graph) probutil.PathDistr {
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	G graphutil.Graph) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-    X := Realization(T, d, Q, nu, k, G)
+		X := Realization(T, d, Q, nu, k, G)
 		return X.Col(0)
 	}
 	return probutil.GetPathDistrSync(f, steps)

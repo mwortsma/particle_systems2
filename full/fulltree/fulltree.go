@@ -17,17 +17,17 @@ type node struct {
 }
 
 func Realization(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
 	depth int) node {
 	// Ger random number to be used throughout
 	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
 
 	if depth < 0 {
-		depth = T-1
+		depth = T - 1
 	}
 	// create tree
 	var root node
@@ -42,12 +42,12 @@ func Realization(
 }
 
 func FinalNeighborhoodDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
 	depth int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
@@ -62,12 +62,12 @@ func FinalNeighborhoodDistr(
 }
 
 func TimeDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
 	depth int) probutil.TimeDistr {
 
 	t_array := make([]float64, T)
@@ -83,11 +83,11 @@ func TimeDistr(
 }
 
 func PathDistr(
-  T int,
-  d int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
+	T int,
+	d int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
 	steps int,
 	depth int) probutil.PathDistr {
 
@@ -135,21 +135,21 @@ func (n *node) createNode(
 }
 
 func (n *node) transition(
-  t int,
-  d int,
-  Q probutil.RealTransition,
-  k int,
-  r *rand.Rand) {
+	t int,
+	d int,
+	Q probutil.RealTransition,
+	k int,
+	r *rand.Rand) {
 
-  neighbors := make([]int, 0)
-  if !n.is_root {
-    neighbors = append(neighbors, n.parent.state[t-1])
-  }
-  for _, c := range n.children {
-    neighbors = append(neighbors, c.state[t-1])
-  }
+	neighbors := make([]int, 0)
+	if !n.is_root {
+		neighbors = append(neighbors, n.parent.state[t-1])
+	}
+	for _, c := range n.children {
+		neighbors = append(neighbors, c.state[t-1])
+	}
 
-  n.state[t] = Q(n.state[t-1], neighbors, r.Float64())
+	n.state[t] = Q(n.state[t-1], neighbors, r.Float64())
 
 	// call transition on children
 	for _, c := range n.children {

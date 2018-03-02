@@ -7,36 +7,35 @@ import (
 
 // Graph specific
 func DenseFinalNeighborhoodDistr(
-  T int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  n int,
+	T int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	n int,
 	d int) probutil.PathDistr {
 
-  return FinalNeighborhoodDistr(T,d,Q,nu,k,steps,graphutil.Complete(n))
+	return FinalNeighborhoodDistr(T, d, Q, nu, k, steps, graphutil.Complete(n))
 }
 
-
 func DenseTimeDistr(
-  T int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  n int) probutil.TimeDistr {
+	T int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	n int) probutil.TimeDistr {
 
-  return TimeDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
+	return TimeDistr(T, n-1, Q, nu, k, steps, graphutil.Complete(n))
 }
 
 func DensePathDistr(
-  T int,
-  Q probutil.RealTransition,
-  nu probutil.InitDistr,
-  k int,
-  steps int,
-  n int) probutil.PathDistr {
+	T int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	n int) probutil.PathDistr {
 
-  return PathDistr(T,n-1,Q,nu,k,steps,graphutil.Complete(n))
+	return PathDistr(T, n-1, Q, nu, k, steps, graphutil.Complete(n))
 }
