@@ -4,6 +4,7 @@ import (
 	"github.com/mwortsma/particle_systems2/full/fullgraph"
 	"github.com/mwortsma/particle_systems2/full/fulltree"
 	"github.com/mwortsma/particle_systems2/local"
+	"github.com/mwortsma/particle_systems2/meanfield"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
 )
@@ -149,4 +150,30 @@ func LocalPathDistr(
 	nu probutil.InitFunc) probutil.PathDistr {
 
 	return local.PathDistr(T, tau, d, getNeighborQ(p, q), nu, 2)
+}
+
+// Mean Field
+func MeanFieldFinalNeighborhoodDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr,
+  d int) probutil.PathDistr {
+
+	return meanfield.FinalNeighborhoodDistr(T, getLawQ(p, q), nu, 2, d)
+}
+
+func MeanFieldTimeDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr) probutil.TimeDistr {
+
+	return meanfield.TimeDistr(T, getLawQ(p, q), nu, 2)
+}
+
+func MeanFieldPathDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr) probutil.PathDistr {
+
+	return meanfield.PathDistr(T, getLawQ(p, q), nu, 2)
 }

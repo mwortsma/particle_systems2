@@ -45,6 +45,10 @@ func main() {
 	contact_local_time := flag.Bool("contact_local_time", false, "")
 	contact_local_end := flag.Bool("contact_local_end", false, "")
 
+	contact_meanfield_path := flag.Bool("contact_meanfield_path", false, "")
+	contact_meanfield_time := flag.Bool("contact_meanfield_time", false, "")
+	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
+
 	flag.Parse()
 
 	var init []float64
@@ -81,6 +85,13 @@ func main() {
 		distr = contact.LocalTimeDistr(*T, *tau, *d, *p, *q, init_f)
 	case *contact_local_end:
 		distr = contact.LocalFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
+
+	case *contact_meanfield_path:
+		distr = contact.MeanFieldPathDistr(*T, *p, *q, init)
+	case *contact_meanfield_time:
+		distr = contact.MeanFieldTimeDistr(*T, *p, *q, init)
+	case *contact_meanfield_end:
+		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 	}
 
 	b, err := json.Marshal(distr)
