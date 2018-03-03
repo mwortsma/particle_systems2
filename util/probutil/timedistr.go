@@ -1,8 +1,8 @@
 package probutil
 
 import (
-	"sync"
 	"github.com/mwortsma/particle_systems2/util/matutil"
+	"sync"
 )
 
 type TimeDistr struct {

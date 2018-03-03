@@ -13,24 +13,24 @@ import (
 func getLawQ(p, q float64) probutil.LawTransition {
 	// transition from s to s_new
 	return func(s_new, s int, f probutil.Law) float64 {
-    if s == 0 {
-      if s_new == 1 {
+		if s == 0 {
+			if s_new == 1 {
 				return p * f[1]
 			} else if s_new == 0 {
 				return 1 - p*f[1]
 			}
-    } else if s == 1 {
+		} else if s == 1 {
 			if s_new == 2 {
 				return q
 			} else if s_new == 1 {
-				return 1-q
+				return 1 - q
 			}
 		} else if s == 2 {
-      if s_new == 2 {
-        return 1
-      }
+			if s_new == 2 {
+				return 1
+			}
 		}
-    return 0
+		return 0
 	}
 }
 
@@ -52,8 +52,8 @@ func getRealQ(p, q float64) probutil.RealTransition {
 				return 0
 			}
 		} else {
-      return 2
-    }
+			return 2
+		}
 	}
 }
 
@@ -164,7 +164,7 @@ func MeanFieldFinalNeighborhoodDistr(
 	T int,
 	p, q float64,
 	nu probutil.InitDistr,
-  d int) probutil.PathDistr {
+	d int) probutil.PathDistr {
 
 	return meanfield.FinalNeighborhoodDistr(T, getLawQ(p, q), nu, 3, d)
 }

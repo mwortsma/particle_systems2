@@ -157,7 +157,7 @@ func MeanFieldFinalNeighborhoodDistr(
 	T int,
 	p, q float64,
 	nu probutil.InitDistr,
-  d int) probutil.PathDistr {
+	d int) probutil.PathDistr {
 
 	return meanfield.FinalNeighborhoodDistr(T, getLawQ(p, q), nu, 2, d)
 }

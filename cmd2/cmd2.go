@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/mwortsma/particle_systems2/models/contact"
+	"github.com/mwortsma/particle_systems2/models/potts"
 	"github.com/mwortsma/particle_systems2/models/sir"
 	"github.com/mwortsma/particle_systems2/util/probutil"
 	"io/ioutil"
@@ -24,10 +25,12 @@ func main() {
 	// Params
 	d := flag.Int("d", -1, "degree of a noe")
 	n := flag.Int("n", -1, "number of nodes")
-	// k := flag.Int("k", -1, "states")
+	k := flag.Int("k", 3, "states")
 	T := flag.Int("T", -1, "time horizon. T>0")
 	depth := flag.Int("depth", -1, "time horizon. T>0")
-	// beta := flag.Float64("beta", 1.5, "temp inverse")
+	beta := flag.Float64("beta", 1.5, "temp inverse")
+	J := flag.Float64("J", 1.0, "potts param")
+	h := flag.Float64("h", 1.0, "potts param")
 	tau := flag.Int("tau", -1, "how many steps to look back")
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
@@ -67,6 +70,21 @@ func main() {
 	sir_meanfield_time := flag.Bool("sir_meanfield_time", false, "")
 	sir_meanfield_end := flag.Bool("sir_meanfield_end", false, "")
 
+	// Potts process
+	potts_mcmc_path := flag.Bool("potts_mcmc_path", false, "")
+	potts_mcmc_time := flag.Bool("potts_mcmc_time", false, "")
+	potts_mcmc_end := flag.Bool("potts_mcmc_end", false, "")
+
+	potts_gibbs_end := flag.Bool("potts_gibbs_end", false, "")
+
+	potts_local_path := flag.Bool("potts_local_path", false, "")
+	potts_local_time := flag.Bool("potts_local_time", false, "")
+	potts_local_end := flag.Bool("potts_local_end", false, "")
+
+	potts_meanfield_path := flag.Bool("potts_meanfield_path", false, "")
+	potts_meanfield_time := flag.Bool("potts_meanfield_time", false, "")
+	potts_meanfield_end := flag.Bool("potts_meanfield_end", false, "")
+
 	flag.Parse()
 
 	var init []float64
@@ -88,14 +106,16 @@ func main() {
 	case *contact_dense_time:
 		distr = contact.DenseTimeDistr(*T, *p, *q, init, *steps, *n)
 	case *contact_dense_end:
-		distr = contact.DenseFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *n, *d)
+		distr = contact.DenseFinalNeighborhoodDistr(
+			*T, *p, *q, init, *steps, *n, *d)
 
 	case *contact_tree_path:
 		distr = contact.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
 	case *contact_tree_time:
 		distr = contact.TreeTimeDistr(*T, *p, *q, *d, init, *steps, *depth)
 	case *contact_tree_end:
-		distr = contact.TreeFinalNeighborhoodDistr(*T, *p, *q, *d, init, *steps, *depth)
+		distr = contact.TreeFinalNeighborhoodDistr(
+			*T, *p, *q, *d, init, *steps, *depth)
 
 	case *contact_local_path:
 		distr = contact.LocalPathDistr(*T, *tau, *d, *p, *q, init_f)
@@ -111,7 +131,7 @@ func main() {
 	case *contact_meanfield_end:
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 
-	// Contact Process
+	// SIR Process
 	case *sir_dense_path:
 		distr = sir.DensePathDistr(*T, *p, *q, init, *steps, *n)
 	case *sir_dense_time:
@@ -139,6 +159,36 @@ func main() {
 		distr = sir.MeanFieldTimeDistr(*T, *p, *q, init)
 	case *sir_meanfield_end:
 		distr = sir.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
+
+		// Potts Process
+	case *potts_mcmc_path:
+		distr = potts.MCMCRingFinalNeighborhoodDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+	case *potts_mcmc_time:
+		distr = potts.MCMCRingTimeDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+	case *potts_mcmc_end:
+		distr = potts.MCMCRingPathDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+
+	case *potts_gibbs_end:
+		distr = potts.GibbsRingFinalNeighborhoodDistr(
+			*beta, *J, *h, *n, *k)
+
+	case *potts_local_path:
+		distr = potts.LocalPathDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+	case *potts_local_time:
+		distr = potts.LocalTimeDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+	case *potts_local_end:
+		distr = potts.LocalFinalNeighborhoodDistr(
+			*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+
+	case *potts_meanfield_path:
+		distr = potts.MeanFieldPathDistr(*T, *d, *k, *n, *beta, *J, *h, init)
+	case *potts_meanfield_time:
+		distr = potts.MeanFieldTimeDistr(*T, *d, *k, *n, *beta, *J, *h, init)
+	case *potts_meanfield_end:
+		distr = potts.MeanFieldFinalNeighborhoodDistr(*T, *d, *k, *n, *beta, *J, *h, init)
 	}
 
 	b, err := json.Marshal(distr)

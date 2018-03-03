@@ -1,7 +1,7 @@
 package mcmc
 
 import (
-  "fmt"
+	"fmt"
 	"golang.org/x/exp/rand"
 	"time"
 
@@ -10,14 +10,16 @@ import (
 	"github.com/mwortsma/particle_systems2/util/probutil"
 )
 
+type NewStateFunc func(matutil.Vec, *rand.Rand) ([]int, []int)
+type TransitionProbFunc func(matutil.Vec, []int, []int) float64
+
 func Realization(
 	T int,
-	NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
-  transitionProb func(matutil.Vec, []int, []int) float64,
+	NewState NewStateFunc,
+	TransitionProb TransitionProbFunc,
 	nu probutil.InitDistr,
-	G graphutil.Graph) matutil.Mat {
+	n int) matutil.Mat {
 
-	n := len(G)
 	X := matutil.Create(T, n)
 
 	// Ger random number to be used throughout
@@ -30,32 +32,32 @@ func Realization(
 
 	for t := 1; t < T; t++ {
 
-    sigma := X[t-1]
-		sites, newvals := NewState(sigma,r)
-
-    X[t] = sigma
-    if r.Float64() < transitionProb(sigma, sites, newvals) {
-      for j, site := range sites {
-        X[t][site] = newvals[j]
-      }
-    }
+		sigma := X[t-1]
+		sites, newvals := NewState(sigma, r)
+		// TODO: double check this slice logic
+		copy(X[t], X[t-1])
+		if r.Float64() < TransitionProb(sigma, sites, newvals) {
+			for j, site := range sites {
+				X[t][site] = newvals[j]
+			}
+		}
 
 	}
 	return X
 }
 
-
 func FinalNeighborhoodDistr(
 	T int,
-  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
-  transitionProb func(matutil.Vec, []int, []int) float64,
+	NewState NewStateFunc,
+	TransitionProb TransitionProbFunc,
 	nu probutil.InitDistr,
 	G graphutil.Graph,
-  steps int,
-  d int) probutil.PathDistr {
+	n int,
+	steps int,
+	d int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		X := Realization(T, NewState, transitionProb, nu, G)
+		X := Realization(T, NewState, TransitionProb, nu, n)
 		v := []int{X[0][T-1]}
 		for i, j := range G[0] {
 			if d > 0 && i >= d {
@@ -69,13 +71,13 @@ func FinalNeighborhoodDistr(
 }
 
 func TimeDistr(
-  T int,
-  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
-  transitionProb func(matutil.Vec, []int, []int) float64,
+	T int,
+	NewState NewStateFunc,
+	TransitionProb TransitionProbFunc,
 	nu probutil.InitDistr,
-  steps int,
-	G graphutil.Graph,
-  k int) probutil.TimeDistr {
+	steps int,
+	n int,
+	k int) probutil.TimeDistr {
 
 	t_array := make([]float64, T)
 	for i := 0; i < T; i++ {
@@ -83,22 +85,22 @@ func TimeDistr(
 	}
 
 	f := func() ([]float64, matutil.Vec) {
-		X := Realization(T, NewState, transitionProb, nu, G)
+		X := Realization(T, NewState, TransitionProb, nu, n)
 		return t_array, X.Col(0)
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), k, steps)
 }
 
 func PathDistr(
-  T int,
-  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
-  transitionProb func(matutil.Vec, []int, []int) float64,
+	T int,
+	NewState NewStateFunc,
+	TransitionProb TransitionProbFunc,
 	nu probutil.InitDistr,
-  steps int,
-	G graphutil.Graph) probutil.PathDistr {
+	steps int,
+	n int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		X := Realization(T, NewState, transitionProb, nu, G)
+		X := Realization(T, NewState, TransitionProb, nu, n)
 		return X.Col(0)
 	}
 	return probutil.GetPathDistrSync(f, steps)

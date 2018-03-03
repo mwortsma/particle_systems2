@@ -1,186 +1,204 @@
 package potts
 
 import (
-	"github.com/mwortsma/particle_systems2/full/fullgraph"
-	"github.com/mwortsma/particle_systems2/full/fulltree"
+	"github.com/mwortsma/particle_systems2/full/gibbs"
+	"github.com/mwortsma/particle_systems2/full/mcmc"
 	"github.com/mwortsma/particle_systems2/local"
 	"github.com/mwortsma/particle_systems2/meanfield"
+	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
+	"golang.org/x/exp/rand"
+	"math"
 )
 
 // General.
-func getLawQ(p, q float64) probutil.LawTransition {
+func getLawQ(n, d, k int, beta, J, h float64) probutil.LawTransition {
 	// transition from s to s_new
 	return func(s_new, s int, f probutil.Law) float64 {
-    if s == 0 {
-      if s_new == 1 {
-				return p * f[1]
-			} else if s_new == 0 {
-				return 1 - p*f[1]
-			}
-    } else if s == 1 {
-			if s_new == 2 {
-				return q
-			} else if s_new == 1 {
-				return 1-q
-			}
-		} else if s == 2 {
-      if s_new == 2 {
-        return 1
-      }
-		}
-    return 0
-	}
-}
-
-func getRealQ(p, q float64) probutil.RealTransition {
-	// transition from s to s_new
-	return func(prev int, neighbors matutil.Vec, r float64) int {
-		if prev == 1 {
-			// transition back with probability q
-			if r < q {
-				return 2
-			} else {
-				return 1
-			}
-		} else if prev == 0 {
-			f := probutil.Freq(neighbors, 3)
-			if r < p*f[1] {
-				return 1
-			} else {
-				return 0
-			}
+		if s_new != s {
+			diff_h := math.Max(
+				float64(d)*J*(f[s]-f[s_new])+h*float64(s_new-s), 0.0)
+			prob_transition := 1.0 / (float64(n) * float64(k-1))
+			return math.Exp(-beta*diff_h) * prob_transition
 		} else {
-      return 2
-    }
+			prob := 0.0
+			for i := 0; i < k; i++ {
+				if i != s {
+					diff_h := math.Max(
+						float64(d)*J*(f[s]-f[i])+h*float64(i-s), 0.0)
+					prob_transition := 1.0 / (float64(n) * float64(k-1))
+					prob += math.Exp(-beta*diff_h) * prob_transition
+				}
+			}
+			return prob
+		}
 	}
 }
 
-func getNeighborQ(p, q float64) probutil.NeighborTransition {
-	return probutil.GetNeighborTransition(getLawQ(p, q), 3)
+func getNeighborQ(n, d, k int, beta, J, h float64) probutil.NeighborTransition {
+	return probutil.GetNeighborTransition(getLawQ(n, d, k, beta, J, h), k)
 }
 
-// Dense.
-func DenseFinalNeighborhoodDistr(
-	T int,
-	p, q float64,
+func getNewStateFunc(n, d, k int, beta, J, h float64) mcmc.NewStateFunc {
+	return func(v matutil.Vec, r *rand.Rand) ([]int, []int) {
+		site := rand.Intn(n)
+		newvalue := rand.Intn(k)
+		for newvalue == v[site] {
+			newvalue = rand.Intn(k)
+		}
+		return []int{site}, []int{newvalue}
+	}
+}
+
+func H(sigma matutil.Vec, J, h float64, G graphutil.Graph) float64 {
+	sum := 0.0
+	for i := range G {
+		sum += h * float64(sigma[i])
+		for _, j := range G[i] {
+			if sigma[i] != sigma[j] {
+				sum += J
+			}
+		}
+	}
+	return sum
+}
+
+func getP(beta, J, h float64, G graphutil.Graph) func(matutil.Vec) float64 {
+	return func(sigma matutil.Vec) float64 {
+		return math.Exp(-beta * H(sigma, J, h, G))
+	}
+}
+
+func getTransitionProbFunc(
+	n, d, k int,
+	beta, J, h float64,
+	G graphutil.Graph) mcmc.TransitionProbFunc {
+	return func(
+		sigma matutil.Vec,
+		sites, newvals []int) float64 {
+		tau := make([]int, n)
+		copy(tau, sigma)
+		for j, site := range sites {
+			tau[site] = newvals[j]
+		}
+		return math.Exp(-beta * (H(tau, J, h, G) - H(sigma, J, h, G)))
+	}
+}
+
+// MCMC -- Ring.
+func MCMCRingFinalNeighborhoodDistr(
+	T, k int,
+	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
 	n int,
 	d int) probutil.PathDistr {
 
-	return fullgraph.DenseFinalNeighborhoodDistr(T, getRealQ(p, q), nu, 3, steps, n, d)
+	return mcmc.FinalNeighborhoodDistr(
+		T, getNewStateFunc(n, d, k, beta, J, h),
+		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
+		nu, graphutil.Ring(n), n, steps, d)
 }
 
-func DenseTimeDistr(
-	T int,
-	p, q float64,
+func MCMCRingTimeDistr(
+	T, k int,
+	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
-	n int) probutil.TimeDistr {
+	n int,
+	d int) probutil.TimeDistr {
 
-	return fullgraph.DenseTimeDistr(T, getRealQ(p, q), nu, 3, steps, n)
-
+	return mcmc.TimeDistr(
+		T, getNewStateFunc(n, d, k, beta, J, h),
+		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
+		nu, steps, n, k)
 }
 
-func DensePathDistr(
-	T int,
-	p, q float64,
+func MCMCRingPathDistr(
+	T, k int,
+	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
-	n int) probutil.PathDistr {
+	n int,
+	d int) probutil.PathDistr {
 
-	return fullgraph.DensePathDistr(T, getRealQ(p, q), nu, 3, steps, n)
+	return mcmc.PathDistr(
+		T, getNewStateFunc(n, d, k, beta, J, h),
+		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
+		nu, steps, n)
 }
 
-// Tree
-func TreeFinalNeighborhoodDistr(
-	T int,
-	p, q float64,
-	d int,
-	nu probutil.InitDistr,
-	steps int,
-	depth int) probutil.PathDistr {
-
-	return fulltree.FinalNeighborhoodDistr(T, d, getRealQ(p, q), nu, 3, steps, depth)
-}
-
-func TreeTimeDistr(
-	T int,
-	p, q float64,
-	d int,
-	nu probutil.InitDistr,
-	steps int,
-	depth int) probutil.TimeDistr {
-
-	return fulltree.TimeDistr(T, d, getRealQ(p, q), nu, 3, steps, depth)
-}
-
-func TreePathDistr(
-	T int,
-	p, q float64,
-	d int,
-	nu probutil.InitDistr,
-	steps int,
-	depth int) probutil.PathDistr {
-
-	return fulltree.PathDistr(T, d, getRealQ(p, q), nu, 3, steps, depth)
+// Gibbs -- Ring.
+func GibbsRingFinalNeighborhoodDistr(
+	beta, J, h float64,
+	n, k int) probutil.PathDistr {
+	return gibbs.FinalNeighborhoodDistr(
+		getP(beta, J, h, graphutil.Ring(n)),
+		graphutil.Ring(n), k)
 }
 
 // Local
 func LocalFinalNeighborhoodDistr(
-	T int,
-	tau int,
-	d int,
-	p, q float64,
+	T, tau, d, k, n int,
+	beta, J, h float64,
 	nu probutil.InitFunc) probutil.PathDistr {
 
-	return local.FinalNeighborhoodDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+	return local.FinalNeighborhoodDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
 }
 
 func LocalTimeDistr(
-	T int,
-	tau int,
-	d int,
-	p, q float64,
+	T, tau, d, k, n int,
+	beta, J, h float64,
 	nu probutil.InitFunc) probutil.TimeDistr {
 
-	return local.TimeDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+	return local.TimeDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
 }
 
 func LocalPathDistr(
-	T int,
-	tau int,
-	d int,
-	p, q float64,
+	T, tau, d, k, n int,
+	beta, J, h float64,
 	nu probutil.InitFunc) probutil.PathDistr {
 
-	return local.PathDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+	return local.PathDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
 }
 
 // Mean Field
 func MeanFieldFinalNeighborhoodDistr(
-	T int,
-	p, q float64,
-	nu probutil.InitDistr,
-  d int) probutil.PathDistr {
+	T, d, k, n int,
+	beta, J, h float64,
+	nu probutil.InitDistr) probutil.PathDistr {
 
-	return meanfield.FinalNeighborhoodDistr(T, getLawQ(p, q), nu, 3, d)
+	return meanfield.FinalNeighborhoodDistr(
+		T, getLawQ(n, d, k, beta, J, h),
+		nu, k, d)
 }
 
 func MeanFieldTimeDistr(
-	T int,
-	p, q float64,
+	T, d, k, n int,
+	beta, J, h float64,
 	nu probutil.InitDistr) probutil.TimeDistr {
 
-	return meanfield.TimeDistr(T, getLawQ(p, q), nu, 3)
+	return meanfield.TimeDistr(
+		T, getLawQ(n, d, k, beta, J, h),
+		nu, k)
 }
 
 func MeanFieldPathDistr(
-	T int,
-	p, q float64,
+	T, d, k, n int,
+	beta, J, h float64,
 	nu probutil.InitDistr) probutil.PathDistr {
 
-	return meanfield.PathDistr(T, getLawQ(p, q), nu, 3)
+	return meanfield.PathDistr(
+		T, getLawQ(n, d, k, beta, J, h),
+		nu, k)
 }
