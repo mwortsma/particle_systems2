@@ -29,7 +29,7 @@ func main() {
 	T := flag.Int("T", -1, "time horizon. T>0")
 	depth := flag.Int("depth", -1, "time horizon. T>0")
 	beta := flag.Float64("beta", 1.5, "temp inverse")
-	J := flag.Float64("J", 1.0, "potts param")
+	J := flag.Float64("J", -1.0, "potts param")
 	h := flag.Float64("h", 1.0, "potts param")
 	tau := flag.Int("tau", -1, "how many steps to look back")
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
