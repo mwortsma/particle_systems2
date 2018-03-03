@@ -13,8 +13,7 @@ import (
 func Realization(
 	T int,
 	NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  E func(v matutil.Vec, G graphutil.Graph) float64,
-  transitionProb func(eTau float64, eSigma float64) float64,
+  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
 	nu probutil.InitDistr,
 	G graphutil.Graph) matutil.Mat {
 
@@ -32,11 +31,9 @@ func Realization(
 	for t := 1; t < T; t++ {
 
     sigma := X[t-1]
-    eSigma := E(sigma,G)
 		tau := NewState(sigma,r)
-    eTau := E(tau,G)
 
-    if eTau < eSigma || r.Float64() < transitionProb(eTau, eSigma) {
+    if r.Float64() < transitionProb(tau, sigma) {
       X[t] = tau
     } else {
       X[t] = sigma
@@ -50,15 +47,14 @@ func Realization(
 func FinalNeighborhoodDistr(
 	T int,
   NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  E func(v matutil.Vec, G graphutil.Graph) float64,
-  transitionProb func(eTau float64, eSigma float64) float64,
+  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
 	nu probutil.InitDistr,
 	G graphutil.Graph,
   steps int,
   d int) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		X := Realization(T, NewState, E, transitionProb, nu, G)
+		X := Realization(T, NewState, transitionProb, nu, G)
 		v := []int{X[0][T-1]}
 		for i, j := range G[0] {
 			if d > 0 && i >= d {
@@ -74,8 +70,7 @@ func FinalNeighborhoodDistr(
 func TimeDistr(
   T int,
   NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  E func(v matutil.Vec, G graphutil.Graph) float64,
-  transitionProb func(eTau float64, eSigma float64) float64,
+  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
 	nu probutil.InitDistr,
   steps int,
 	G graphutil.Graph,
@@ -87,7 +82,7 @@ func TimeDistr(
 	}
 
 	f := func() ([]float64, matutil.Vec) {
-		X := Realization(T, NewState, E, transitionProb, nu, G)
+		X := Realization(T, NewState, transitionProb, nu, G)
 		return t_array, X.Col(0)
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), k, steps)
@@ -96,14 +91,13 @@ func TimeDistr(
 func PathDistr(
   T int,
   NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  E func(v matutil.Vec, G graphutil.Graph) float64,
-  transitionProb func(eTau float64, eSigma float64) float64,
+  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
 	nu probutil.InitDistr,
   steps int,
 	G graphutil.Graph) probutil.PathDistr {
 
 	f := func() fmt.Stringer {
-		X := Realization(T, NewState, E, transitionProb, nu, G)
+		X := Realization(T, NewState, transitionProb, nu, G)
 		return X.Col(0)
 	}
 	return probutil.GetPathDistrSync(f, steps)
