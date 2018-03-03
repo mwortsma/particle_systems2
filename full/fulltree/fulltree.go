@@ -79,7 +79,7 @@ func TimeDistr(
 		x := Realization(T, d, Q, nu, k, depth)
 		return t_array, x.state
 	}
-	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
+	return probutil.GetTimeDistrSync(f, 1, float64(T), k, steps)
 }
 
 func PathDistr(

@@ -54,7 +54,7 @@ func FinalNeighborhoodDistr(
 		X := Realization(T, d, Q, nu, k, G)
 		v := []int{X[0][T-1]}
 		for i, j := range G[0] {
-			if i >= d {
+			if d > 0 && i >= d {
 				break
 			}
 			v = append(v, X[T-1][j])
@@ -82,7 +82,7 @@ func TimeDistr(
 		X := Realization(T, d, Q, nu, k, G)
 		return t_array, X.Col(0)
 	}
-	return probutil.GetTimeDistrSync(f, 1, float64(T), 2, steps)
+	return probutil.GetTimeDistrSync(f, 1, float64(T), k, steps)
 }
 
 func PathDistr(
