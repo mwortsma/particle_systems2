@@ -12,8 +12,8 @@ import (
 
 func Realization(
 	T int,
-	NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
+	NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
+  transitionProb func(matutil.Vec, []int, []int) float64,
 	nu probutil.InitDistr,
 	G graphutil.Graph) matutil.Mat {
 
@@ -31,12 +31,13 @@ func Realization(
 	for t := 1; t < T; t++ {
 
     sigma := X[t-1]
-		tau := NewState(sigma,r)
+		sites, newvals := NewState(sigma,r)
 
-    if r.Float64() < transitionProb(tau, sigma) {
-      X[t] = tau
-    } else {
-      X[t] = sigma
+    X[t] = sigma
+    if r.Float64() < transitionProb(sigma, sites, newvals) {
+      for j, site := range sites {
+        X[t][site] = newvals[j]
+      }
     }
 
 	}
@@ -46,8 +47,8 @@ func Realization(
 
 func FinalNeighborhoodDistr(
 	T int,
-  NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
+  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
+  transitionProb func(matutil.Vec, []int, []int) float64,
 	nu probutil.InitDistr,
 	G graphutil.Graph,
   steps int,
@@ -69,8 +70,8 @@ func FinalNeighborhoodDistr(
 
 func TimeDistr(
   T int,
-  NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
+  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
+  transitionProb func(matutil.Vec, []int, []int) float64,
 	nu probutil.InitDistr,
   steps int,
 	G graphutil.Graph,
@@ -90,8 +91,8 @@ func TimeDistr(
 
 func PathDistr(
   T int,
-  NewState func(v matutil.Vec, r *rand.Rand) matutil.Vec,
-  transitionProb func(tau matutil.Vec, sigma matutil.Vec) float64,
+  NewState func(matutil.Vec, *rand.Rand) ([]int, []int),
+  transitionProb func(matutil.Vec, []int, []int) float64,
 	nu probutil.InitDistr,
   steps int,
 	G graphutil.Graph) probutil.PathDistr {
