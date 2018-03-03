@@ -5,6 +5,8 @@ import (
 	"github.com/mwortsma/particle_systems2/util/probutil"
 )
 
+// Untested.
+
 // Graph specific
 func RingFinalNeighborhoodDistr(
 	T int,

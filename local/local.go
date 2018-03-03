@@ -21,8 +21,6 @@ func getJointAndTransitionKernel(
 	c probutil.Conditional,
 	k int) (probutil.PathDistr, probutil.PathDistr) {
 
-	fmt.Println("Obtaining joint at", t)
-
 	jnew := make(probutil.PathDistr)
 
 	p := make(probutil.PathDistr)
@@ -71,7 +69,6 @@ func getConditional(
 	d int,
 	jt probutil.PathDistr,
 	k int) probutil.Conditional {
-	fmt.Println("Obtaining Conditional at", t)
 
 	ct := make(probutil.Conditional)
 

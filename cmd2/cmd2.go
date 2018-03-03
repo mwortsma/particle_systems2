@@ -16,7 +16,7 @@ func main() {
 
 	// Get initial conditions.
 	var nu string
-	flag.StringVar(&nu, "nu", "", "Initial Conditions, i.e. [0.3, 0.7]")
+	flag.StringVar(&nu, "nu", "[0.3,0.7]", "Initial Conditions, i.e. [0.3,0.7]")
 
 	// File
 	var file_str string
@@ -76,6 +76,7 @@ func main() {
 	potts_mcmc_end := flag.Bool("potts_mcmc_end", false, "")
 
 	potts_gibbs_end := flag.Bool("potts_gibbs_end", false, "")
+	potts_gibbs_time := flag.Bool("potts_gibbs_time", false, "")
 
 	potts_local_path := flag.Bool("potts_local_path", false, "")
 	potts_local_time := flag.Bool("potts_local_time", false, "")
@@ -161,19 +162,22 @@ func main() {
 		distr = sir.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 
 		// Potts Process
-	case *potts_mcmc_path:
+	case *potts_mcmc_end:
 		distr = potts.MCMCRingFinalNeighborhoodDistr(
 			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
 	case *potts_mcmc_time:
 		distr = potts.MCMCRingTimeDistr(
 			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
-	case *potts_mcmc_end:
+	case *potts_mcmc_path:
 		distr = potts.MCMCRingPathDistr(
 			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
 
 	case *potts_gibbs_end:
 		distr = potts.GibbsRingFinalNeighborhoodDistr(
 			*beta, *J, *h, *n, *k)
+	case *potts_gibbs_time:
+		distr = potts.GibbsRingTimeDistr(
+			*T, *beta, *J, *h, *n, *k)
 
 	case *potts_local_path:
 		distr = potts.LocalPathDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
@@ -190,6 +194,8 @@ func main() {
 	case *potts_meanfield_end:
 		distr = potts.MeanFieldFinalNeighborhoodDistr(*T, *d, *k, *n, *beta, *J, *h, init)
 	}
+
+	fmt.Println(distr)
 
 	b, err := json.Marshal(distr)
 	if err != nil {

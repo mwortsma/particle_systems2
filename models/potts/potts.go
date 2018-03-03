@@ -130,6 +130,15 @@ func MCMCRingPathDistr(
 }
 
 // Gibbs -- Ring.
+func GibbsRingTimeDistr(
+	T int,
+	beta, J, h float64,
+	n, k int) probutil.TimeDistr {
+	return gibbs.TimeDistr(
+		T, getP(beta, J, h, graphutil.Ring(n)),
+		graphutil.Ring(n), k)
+}
+
 func GibbsRingFinalNeighborhoodDistr(
 	beta, J, h float64,
 	n, k int) probutil.PathDistr {
