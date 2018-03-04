@@ -4,6 +4,7 @@ import json
 import plot
 import subprocess
 import string
+import random
 
 parser=argparse.ArgumentParser()
 
@@ -44,11 +45,12 @@ if os.path.isdir(tmp_folder):
 if args.binary_path and args.binary_path[-1] != '/': args.binary_path += '/'
 prefix = "" if args.binary_path is None else args.binary_path
 
+rand_seed = random.randint(1, 1 << 20)
 # Run commands
 if args.dontrun:
 	print 'running'
 	for i in range(len(commands)):
-		revised_command = "time " + prefix + commands[i] + " -file=" + files[i]
+		revised_command = "time " + prefix + commands[i] + " -file=" + files[i] + " -seed=" + str(rand_seed)
 		if args.shared is not None:
 			revised_command = revised_command + " " + args.shared
 		print "running: " + revised_command

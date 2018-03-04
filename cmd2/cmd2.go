@@ -40,6 +40,8 @@ func main() {
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
 	steps := flag.Int("steps", -1, "for estimating probability")
 	erp := flag.Float64("erp", 0.1, "random graph edge probability")
+	seed := flag.Int("seed", 10, "for shared random seed")
+
 
 	// Contact process
 	contact_graph_path := flag.Bool("contact_graph_path", false, "")
@@ -102,7 +104,7 @@ func main() {
 	}
 	init_f := probutil.GetInitFunc(init)
 
-	G := graphutil.GetGraph(graph,*n,*erp)
+	G := graphutil.GetGraph(graph,*n,*erp,*seed)
 
 	var distr probutil.Distr
 
@@ -202,7 +204,7 @@ func main() {
 		distr = potts.MeanFieldFinalNeighborhoodDistr(*T, *d, *k, *n, *beta, *J, *h, init)
 	}
 
-	fmt.Println(distr)
+	// fmt.Println(distr)
 
 	b, err := json.Marshal(distr)
 	if err != nil {
