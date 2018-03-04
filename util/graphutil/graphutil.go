@@ -3,12 +3,21 @@ package graphutil
 import (
 	"bytes"
 	"fmt"
+	"golang.org/x/exp/rand"
+	"time"
 )
 
 type Graph [][]int
 
-// TODO
-func GetGraph(graph string, n int) Graph {
+func GetGraph(graph string, n int, erp float64) Graph {
+	switch graph {
+	case "ring":
+		return Ring(n)
+	case "complete":
+		return Complete(n)
+	case "ER":
+		return ER(n, erp)
+	}
 	return Ring(n)
 }
 
@@ -28,6 +37,21 @@ func Complete(n int) Graph {
 		G[i] = make([]int, 0)
 		for j := 0; j < n; j++ {
 			if j != i {
+				G[i] = append(G[i], j)
+			}
+		}
+	}
+	return G
+}
+
+// ER random graph.
+func ER(n int, erp float64) Graph {
+	r := rand.New(rand.NewSource(uint64(time.Now().UnixNano())))
+	G := make(Graph, n)
+	for i := 0; i < n; i++ {
+		G[i] = make([]int, 0)
+		for j := 0; j < n; j++ {
+			if j != i && r.Float64() < erp {
 				G[i] = append(G[i], j)
 			}
 		}

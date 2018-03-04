@@ -39,6 +39,7 @@ func main() {
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
 	steps := flag.Int("steps", -1, "for estimating probability")
+	erp := flag.Float64("erp", 0.1, "random graph edge probability")
 
 	// Contact process
 	contact_graph_path := flag.Bool("contact_graph_path", false, "")
@@ -101,7 +102,7 @@ func main() {
 	}
 	init_f := probutil.GetInitFunc(init)
 
-	G := graphutil.GetGraph(graph,*n)
+	G := graphutil.GetGraph(graph,*n,*erp)
 
 	var distr probutil.Distr
 
