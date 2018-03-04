@@ -8,6 +8,7 @@ import (
 	"github.com/mwortsma/particle_systems2/models/potts"
 	"github.com/mwortsma/particle_systems2/models/sir"
 	"github.com/mwortsma/particle_systems2/util/probutil"
+	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"io/ioutil"
 	"strings"
 )
@@ -16,7 +17,10 @@ func main() {
 
 	// Get initial conditions.
 	var nu string
-	flag.StringVar(&nu, "nu", "[0.3,0.7]", "Initial Conditions, i.e. [0.3,0.7]")
+	flag.StringVar(&nu, "nu", "[0.3,0.3,0.4]", "Initial Conditions, i.e. [0.3,0.7]")
+
+	var graph string
+	flag.StringVar(&graph, "graph", "ring", "Graph type: ring, dense, random")
 
 	// File
 	var file_str string
@@ -24,7 +28,7 @@ func main() {
 
 	// Params
 	d := flag.Int("d", -1, "degree of a noe")
-	n := flag.Int("n", -1, "number of nodes")
+	n := flag.Int("n", 10, "number of nodes")
 	k := flag.Int("k", 3, "states")
 	T := flag.Int("T", -1, "time horizon. T>0")
 	depth := flag.Int("depth", -1, "time horizon. T>0")
@@ -37,9 +41,9 @@ func main() {
 	steps := flag.Int("steps", -1, "for estimating probability")
 
 	// Contact process
-	contact_dense_path := flag.Bool("contact_dense_path", false, "")
-	contact_dense_time := flag.Bool("contact_dense_time", false, "")
-	contact_dense_end := flag.Bool("contact_dense_end", false, "")
+	contact_graph_path := flag.Bool("contact_graph_path", false, "")
+	contact_graph_time := flag.Bool("contact_graph_time", false, "")
+	contact_graph_end := flag.Bool("contact_graph_end", false, "")
 
 	contact_tree_path := flag.Bool("contact_tree_path", false, "")
 	contact_tree_time := flag.Bool("contact_tree_time", false, "")
@@ -54,9 +58,9 @@ func main() {
 	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
 
 	// SIR process
-	sir_dense_path := flag.Bool("sir_dense_path", false, "")
-	sir_dense_time := flag.Bool("sir_dense_time", false, "")
-	sir_dense_end := flag.Bool("sir_dense_end", false, "")
+	sir_graph_path := flag.Bool("sir_graph_path", false, "")
+	sir_graph_time := flag.Bool("sir_graph_time", false, "")
+	sir_graph_end := flag.Bool("sir_graph_end", false, "")
 
 	sir_tree_path := flag.Bool("sir_tree_path", false, "")
 	sir_tree_time := flag.Bool("sir_tree_time", false, "")
@@ -97,18 +101,20 @@ func main() {
 	}
 	init_f := probutil.GetInitFunc(init)
 
+	G := graphutil.GetGraph(graph,*n)
+
 	var distr probutil.Distr
 
 	switch {
 
 	// Contact Process
-	case *contact_dense_path:
-		distr = contact.DensePathDistr(*T, *p, *q, init, *steps, *n)
-	case *contact_dense_time:
-		distr = contact.DenseTimeDistr(*T, *p, *q, init, *steps, *n)
-	case *contact_dense_end:
-		distr = contact.DenseFinalNeighborhoodDistr(
-			*T, *p, *q, init, *steps, *n, *d)
+	case *contact_graph_path:
+		distr = contact.GraphPathDistr(*T, *p, *q, init, *steps, G)
+	case *contact_graph_time:
+		distr = contact.GraphTimeDistr(*T, *p, *q, init, *steps, G)
+	case *contact_graph_end:
+		distr = contact.GraphFinalNeighborhoodDistr(
+			*T, *p, *q, init, *steps, *d, G)
 
 	case *contact_tree_path:
 		distr = contact.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
@@ -133,12 +139,12 @@ func main() {
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 
 	// SIR Process
-	case *sir_dense_path:
-		distr = sir.DensePathDistr(*T, *p, *q, init, *steps, *n)
-	case *sir_dense_time:
-		distr = sir.DenseTimeDistr(*T, *p, *q, init, *steps, *n)
-	case *sir_dense_end:
-		distr = sir.DenseFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *n, *d)
+	case *sir_graph_path:
+		distr = sir.GraphPathDistr(*T, *p, *q, init, *steps, G)
+	case *sir_graph_time:
+		distr = sir.GraphTimeDistr(*T, *p, *q, init, *steps, G)
+	case *sir_graph_end:
+		distr = sir.GraphFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *d, G)
 
 	case *sir_tree_path:
 		distr = sir.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
@@ -163,21 +169,21 @@ func main() {
 
 		// Potts Process
 	case *potts_mcmc_end:
-		distr = potts.MCMCRingFinalNeighborhoodDistr(
-			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+		distr = potts.MCMCFinalNeighborhoodDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d, G)
 	case *potts_mcmc_time:
-		distr = potts.MCMCRingTimeDistr(
-			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+		distr = potts.MCMCTimeDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d, G)
 	case *potts_mcmc_path:
-		distr = potts.MCMCRingPathDistr(
-			*T, *k, *beta, *J, *h, init, *steps, *n, *d)
+		distr = potts.MCMCPathDistr(
+			*T, *k, *beta, *J, *h, init, *steps, *n, *d, G)
 
 	case *potts_gibbs_end:
-		distr = potts.GibbsRingFinalNeighborhoodDistr(
-			*beta, *J, *h, *n, *k)
+		distr = potts.GibbsFinalNeighborhoodDistr(
+			*beta, *J, *h, *k, G)
 	case *potts_gibbs_time:
-		distr = potts.GibbsRingTimeDistr(
-			*T, *beta, *J, *h, *n, *k)
+		distr = potts.GibbsTimeDistr(
+			*T, *beta, *J, *h, *k, G)
 
 	case *potts_local_path:
 		distr = potts.LocalPathDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)

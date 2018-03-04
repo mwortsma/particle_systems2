@@ -7,6 +7,7 @@ import (
 	"github.com/mwortsma/particle_systems2/meanfield"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
+	"github.com/mwortsma/particle_systems2/util/graphutil"
 )
 
 // General.
@@ -54,37 +55,37 @@ func getNeighborQ(p, q float64) probutil.NeighborTransition {
 	return probutil.GetNeighborTransition(getLawQ(p, q), 2)
 }
 
-// Dense.
-func DenseFinalNeighborhoodDistr(
+// Gen graph.
+func GraphFinalNeighborhoodDistr(
 	T int,
 	p, q float64,
 	nu probutil.InitDistr,
 	steps int,
-	n int,
-	d int) probutil.PathDistr {
+	d int,
+	G graphutil.Graph) probutil.PathDistr {
 
-	return fullgraph.DenseFinalNeighborhoodDistr(T, getRealQ(p, q), nu, 2, steps, n, d)
+	return fullgraph.FinalNeighborhoodDistr(T, d, getRealQ(p, q), nu, 2, steps, G)
 }
 
-func DenseTimeDistr(
+func GraphTimeDistr(
 	T int,
 	p, q float64,
 	nu probutil.InitDistr,
 	steps int,
-	n int) probutil.TimeDistr {
+	G graphutil.Graph) probutil.TimeDistr {
 
-	return fullgraph.DenseTimeDistr(T, getRealQ(p, q), nu, 2, steps, n)
+	return fullgraph.TimeDistr(T, getRealQ(p, q), nu, 2, steps, G)
 
 }
 
-func DensePathDistr(
+func GraphPathDistr(
 	T int,
 	p, q float64,
 	nu probutil.InitDistr,
 	steps int,
-	n int) probutil.PathDistr {
+	G graphutil.Graph) probutil.PathDistr {
 
-	return fullgraph.DensePathDistr(T, getRealQ(p, q), nu, 2, steps, n)
+	return fullgraph.PathDistr(T, getRealQ(p, q), nu, 2, steps, G)
 }
 
 // Tree

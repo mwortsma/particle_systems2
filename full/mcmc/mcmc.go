@@ -61,7 +61,6 @@ func FinalNeighborhoodDistr(
 		v := []int{X[T-1][0]}
 		for i, j := range G[0] {
 			if d > 0 && i >= d {
-				fmt.Println("here?")
 				break
 			}
 			v = append(v, X[T-1][j])

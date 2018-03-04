@@ -92,65 +92,70 @@ func getTransitionProbFunc(
 	}
 }
 
-// MCMC -- Ring.
-func MCMCRingFinalNeighborhoodDistr(
+// MCMC
+func MCMCFinalNeighborhoodDistr(
 	T, k int,
 	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
 	n int,
-	d int) probutil.PathDistr {
+	d int,
+	G graphutil.Graph) probutil.PathDistr {
 
 	return mcmc.FinalNeighborhoodDistr(
 		T, getNewStateFunc(n, d, k, beta, J, h),
-		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
-		nu, graphutil.Ring(n), n, steps, d)
+		getTransitionProbFunc(n, d, k, beta, J, h, G),
+		nu, G, n, steps, d)
 }
 
-func MCMCRingTimeDistr(
+func MCMCTimeDistr(
 	T, k int,
 	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
 	n int,
-	d int) probutil.TimeDistr {
+	d int,
+	G graphutil.Graph) probutil.TimeDistr {
 
 	return mcmc.TimeDistr(
 		T, getNewStateFunc(n, d, k, beta, J, h),
-		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
+		getTransitionProbFunc(n, d, k, beta, J, h, G),
 		nu, steps, n, k)
 }
 
-func MCMCRingPathDistr(
+func MCMCPathDistr(
 	T, k int,
 	beta, J, h float64,
 	nu probutil.InitDistr,
 	steps int,
 	n int,
-	d int) probutil.PathDistr {
+	d int,
+	G graphutil.Graph) probutil.PathDistr {
 
 	return mcmc.PathDistr(
 		T, getNewStateFunc(n, d, k, beta, J, h),
-		getTransitionProbFunc(n, d, k, beta, J, h, graphutil.Ring(n)),
+		getTransitionProbFunc(n, d, k, beta, J, h, G),
 		nu, steps, n)
 }
 
-// Gibbs -- Ring.
-func GibbsRingTimeDistr(
+// Gibbs
+func GibbsTimeDistr(
 	T int,
 	beta, J, h float64,
-	n, k int) probutil.TimeDistr {
+	k int,
+	G graphutil.Graph) probutil.TimeDistr {
 	return gibbs.TimeDistr(
-		T, getP(beta, J, h, graphutil.Ring(n)),
-		graphutil.Ring(n), k)
+		T, getP(beta, J, h, G),
+		G, k)
 }
 
-func GibbsRingFinalNeighborhoodDistr(
+func GibbsFinalNeighborhoodDistr(
 	beta, J, h float64,
-	n, k int) probutil.PathDistr {
+	k int,
+	G graphutil.Graph) probutil.PathDistr {
 	return gibbs.FinalNeighborhoodDistr(
-		getP(beta, J, h, graphutil.Ring(n)),
-		graphutil.Ring(n), k)
+		getP(beta, J, h, G),
+		G, k)
 }
 
 // Local

@@ -7,6 +7,11 @@ import (
 
 type Graph [][]int
 
+// TODO
+func GetGraph(graph string, n int) Graph {
+	return Ring(n)
+}
+
 // Ring makes a ring Graph with n nodes.
 func Ring(n int) Graph {
 	G := make(Graph, n)
