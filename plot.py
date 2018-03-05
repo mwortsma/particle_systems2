@@ -14,6 +14,14 @@ def plot_path(distributions, labels, show, save):
 	for i in range(len(distributions)):
 		d = distributions[i]
 		plt.plot([d[k] for k in keys], label=labels[i])
+		print [d[k] for k in keys]
+	for i in range(len(distributions)):
+		for j in range(i+1,len(distributions)):
+			print "Error between " + str(labels[i]) + " " + str(labels[j]) + ":"
+			d1 = distributions[i]
+			d2 = distributions[j]
+			print sum([abs(d1[k]-d2[k]) for k in keys])
+			print max([abs(d1[k]-d2[k]) for k in keys])
 	plt.legend(loc=2)
 	plt.ylabel("Probability")
 	if show:
