@@ -16,6 +16,7 @@ parser.add_argument('-commands', action='store')
 parser.add_argument('-dontrun', action='store_false')
 parser.add_argument('-shared', action='store')
 parser.add_argument('-labels', action='store')
+parser.add_argument('-title', action='store')
 parser.add_argument('-files', action='store')
 parser.add_argument('-type', action='store')
 
@@ -68,11 +69,13 @@ print len(distributions)
 if args.save_plot or args.show_plot:
 	print args.type
 	if args.type is None or args.type == 'path':
-		plot.plot_path(distributions, labels, args.show_plot, args.save_plot)
+		plot.plot_path(distributions, labels, args.show_plot, args.save_plot, args.title)
 	elif args.type == 'time':
-		plot.plot_time(distributions, labels, args.show_plot, args.save_plot)
+		plot.plot_time(distributions, labels, args.show_plot, args.save_plot, args.title)
 	elif args.type == 'time_full':
-		plot.plot_time_full(distributions, labels, args.show_plot, args.save_plot)
+		plot.plot_time_full(distributions, labels, args.show_plot, args.save_plot, args.title)
+	elif args.type == 'time_gif':
+		plot.plot_time_gif(distributions, labels, args.show_plot, args.save_plot, args.title)
 
 # Delete the files if keep=True
 if not args.keep:

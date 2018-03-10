@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 from matplotlib import pylab
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
+import sys
 
 def get_keys(distributions):
 	for d1 in distributions:
@@ -9,7 +12,7 @@ def get_keys(distributions):
 				if k not in d2: d2[k] = 0
 	return sorted(distributions[0].keys())
 
-def plot_path(distributions, labels, show, save):
+def plot_path(distributions, labels, show, save, title):
 	keys = get_keys(distributions)
 	for i in range(len(distributions)):
 		d = distributions[i]
@@ -30,23 +33,24 @@ def plot_path(distributions, labels, show, save):
 		plt.savefig(save)
 
 
-def plot_time(distributions, labels, show, save):
+def plot_time(distributions, labels, show, save, title):
 	for i in range(len(distributions)):
 		d = distributions[i]
 		k = d['K']
 		arr = np.array(d['Distr'])
-		for j in range(k-1):
+		for j in range(0,1):
 			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
 				label=(labels[i]+" P(X="+str(j))+")")
 	plt.legend(loc=2)
 	plt.xlabel("Time")
+	plt.title(title)
 	if show:
 		plt.show()
 	if save and save != "":
 		plt.savefig(save)
 
 
-def plot_time_full(distributions, labels, show, save):
+def plot_time_full(distributions, labels, show, save, title):
 	for i in range(len(distributions)):
 		d = distributions[i]
 		k = d['K']
@@ -60,3 +64,39 @@ def plot_time_full(distributions, labels, show, save):
 		plt.show()
 	if save and save != "":
 		plt.savefig(save)
+
+
+## GIFFS
+def update_time_gif(distributions, labels, ax, total_iters,i):
+    ax.cla()
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Probability of Being 0")
+    arr = np.array(distributions[0]['Distr'])
+    T = len(arr[:,0])
+    ax.set_xlim((0,T))
+    ax.set_ylim((0,1))
+
+    for j in range(0, len(distributions)):
+        d = distributions[j]
+        k = d['K']
+        arr = np.array(d['Distr'])
+        T = int((i/float(total_iters))*len(arr[:,0]))
+        print T
+        ax.plot(np.arange(0, len(arr[:T,0])*d['Dt'],d['Dt']), arr[:T,0],
+	        label=(labels[j]+" P(X="+str(0))+")")
+
+	ax.legend(loc=2)
+    return None, ax
+
+
+def plot_time_gif(distributions, labels, show, save, title):
+	total_iters = 40
+
+	fig, ax = plt.subplots()
+	fig.set_tight_layout(True)
+
+	update = lambda i : update_time_gif(distributions,labels,ax,total_iters,i)
+
+	anim = FuncAnimation(fig, update, frames=np.arange(0, total_iters), interval=200)
+	#plt.show()
+	anim.save('anim.gif', dpi=80, writer='imagemagick')
