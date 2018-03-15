@@ -27,7 +27,7 @@ func Realization(
 	for i := 0; i < n; i++ {
 	    X[0][i] = probutil.Sample(nu, r.Float64())
 	}
-  /*
+
   for t := 1; t < T; t++ {
 		for i := 0; i < n; i++ {
 			// get the sum of the neighbors
@@ -38,7 +38,7 @@ func Realization(
 			X[t][i] = Q(X[t-1][i], neighbors, r.Float64())
 		}
 	}
-  */
+
 
   for tstep := 0; tstep < tlim; tstep++ {
     for i := 0; i < n; i++ {
@@ -54,6 +54,7 @@ func Realization(
   }
 	return X
 }
+
 
 func FinalNeighborhoodDistr(
 	T int,
@@ -98,4 +99,20 @@ func TimeDistr(
 		return t_array, X.Col(0)
 	}
 	return probutil.GetTimeDistrSync(f, 1, float64(T), k, steps)
+}
+
+func PathDistr(
+	T int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	steps int,
+	G graphutil.Graph,
+  tlim int) probutil.PathDistr {
+
+	f := func() fmt.Stringer {
+		X := Realization(T, Q, nu, k, G, tlim)
+		return X.Col(3)
+	}
+	return probutil.GetPathDistrSync(f, steps)
 }
