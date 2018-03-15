@@ -39,6 +39,7 @@ func main() {
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
 	steps := flag.Int("steps", -1, "for estimating probability")
+	tlim := flag.Int("tlim", 100, "for gibbs sampling")
 	erp := flag.Float64("erp", 0.1, "random graph edge probability")
 	seed := flag.Int("seed", 10, "for shared random seed")
 
@@ -59,6 +60,10 @@ func main() {
 	contact_meanfield_path := flag.Bool("contact_meanfield_path", false, "")
 	contact_meanfield_time := flag.Bool("contact_meanfield_time", false, "")
 	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
+
+	contact_gs_path := flag.Bool("contact_gs_path", false, "")
+	contact_gs_time := flag.Bool("contact_gs_time", false, "")
+	contact_gs_end := flag.Bool("contact_gs_end", false, "")
 
 	// SIR process
 	sir_graph_path := flag.Bool("sir_graph_path", false, "")
@@ -140,6 +145,14 @@ func main() {
 		distr = contact.MeanFieldTimeDistr(*T, *p, *q, init)
 	case *contact_meanfield_end:
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
+
+	case *contact_gs_path:
+		distr = contact.GSGraphPathDistr(*T, *p, *q, init, *steps, G, *tlim)
+	case *contact_gs_time:
+		distr = contact.GSGraphTimeDistr(*T, *p, *q, init, *steps, G, *tlim)
+	case *contact_gs_end:
+		distr = contact.GSGraphFinalNeighborhoodDistr(
+			*T, *p, *q, init, *steps, *d, G, *tlim)
 
 	// SIR Process
 	case *sir_graph_path:

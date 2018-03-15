@@ -4,6 +4,7 @@ import (
 	"github.com/mwortsma/particle_systems2/full/fullgraph"
 	"github.com/mwortsma/particle_systems2/full/fulltree"
 	"github.com/mwortsma/particle_systems2/local"
+	"github.com/mwortsma/particle_systems2/gs"
 	"github.com/mwortsma/particle_systems2/meanfield"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
@@ -177,4 +178,41 @@ func MeanFieldPathDistr(
 	nu probutil.InitDistr) probutil.PathDistr {
 
 	return meanfield.PathDistr(T, getLawQ(p, q), nu, 2)
+}
+
+
+// GS.
+func GSGraphFinalNeighborhoodDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr,
+	steps int,
+	d int,
+	G graphutil.Graph,
+	tlim int) probutil.PathDistr {
+
+	return gs.FinalNeighborhoodDistr(T, d, getRealQ(p, q), nu, 2, steps, G, tlim)
+}
+
+func GSGraphTimeDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr,
+	steps int,
+	G graphutil.Graph,
+	tlim int) probutil.TimeDistr {
+
+	return gs.TimeDistr(T, getRealQ(p, q), nu, 2, steps, G, tlim)
+
+}
+
+func GSGraphPathDistr(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr,
+	steps int,
+	G graphutil.Graph,
+	tlim int) probutil.PathDistr {
+
+	return gs.PathDistr(T, getRealQ(p, q), nu, 2, steps, G, tlim)
 }
