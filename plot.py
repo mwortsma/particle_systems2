@@ -26,6 +26,7 @@ def plot_path(distributions, labels, show, save, title):
 			print sum([abs(d1[k]-d2[k]) for k in keys])
 			print max([abs(d1[k]-d2[k]) for k in keys])
 	plt.legend(loc=2)
+	plt.xlabel("Possible Neighborhood States")
 	plt.ylabel("Probability")
 	if show:
 		plt.show()
@@ -70,7 +71,7 @@ def plot_time_full(distributions, labels, show, save, title):
 def update_time_gif(distributions, labels, ax, total_iters,i):
     ax.cla()
     ax.set_xlabel("Time")
-    ax.set_ylabel("Probability of Being 0")
+    ax.set_ylabel("Probability")
     arr = np.array(distributions[0]['Distr'])
     T = len(arr[:,0])
     ax.set_xlim((0,T))
