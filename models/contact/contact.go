@@ -191,7 +191,7 @@ func GSGraphFinalNeighborhoodDistr(
 	G graphutil.Graph,
 	tlim int) probutil.PathDistr {
 
-	return gs.FinalNeighborhoodDistr(T, d, getRealQ(p, q), nu, 2, steps, G, tlim)
+	return gs.FinalNeighborhoodDistr(T, d, getRealQ(p, q), getNeighborQ(p, q), nu, 2, steps, G, tlim)
 }
 
 func GSGraphTimeDistr(
@@ -202,7 +202,7 @@ func GSGraphTimeDistr(
 	G graphutil.Graph,
 	tlim int) probutil.TimeDistr {
 
-	return gs.TimeDistr(T, getRealQ(p, q), nu, 2, steps, G, tlim)
+	return gs.TimeDistr(T, getRealQ(p, q), getNeighborQ(p, q), nu, 2, steps, G, tlim)
 
 }
 
@@ -214,5 +214,5 @@ func GSGraphPathDistr(
 	G graphutil.Graph,
 	tlim int) probutil.PathDistr {
 
-	return gs.PathDistr(T, getRealQ(p, q), nu, 2, steps, G, tlim)
+	return gs.PathDistr(T, getRealQ(p, q), getNeighborQ(p, q), nu, 2, steps, G, tlim)
 }
