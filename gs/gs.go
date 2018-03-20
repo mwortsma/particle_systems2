@@ -20,7 +20,7 @@ func Realization(
 
   j := 2
   n := len(G)
-  numrotations := 50
+  numrotations := 30
 
 	X := matutil.Create(T, n)
 
@@ -39,32 +39,48 @@ func Realization(
       // choose t at random
       t := r.Intn(T)
       // calculate prob X[t][j] = 0
-      if t > 0 && t < T-1 {
-        prob0 := Q(0, X[t-1][j], []int{X[t-1][j-1], X[t-1][j+1]})
+
+      prob0 := 1.0
+      prob1 := 1.0
+
+      if t > 0 {
+        prob0 *= Q(0, X[t-1][j], []int{X[t-1][j-1], X[t-1][j+1]})
+      }
+      if t < T-1 {
         prob0 *= Q(X[t+1][j], 0, []int{X[t][j-1], X[t][j+1]})
         prob0 *= Q(X[t+1][j+1], X[t][j+1], []int{0, X[t][j+2]})
         prob0 *= Q(X[t+1][j-1], X[t][j-1], []int{0, X[t][j-2]})
+      }
 
-        prob1 := Q(1, X[t-1][j], []int{X[t-1][j-1], X[t-1][j+1]})
+      if t > 0 {
+        prob1 *= Q(1, X[t-1][j], []int{X[t-1][j-1], X[t-1][j+1]})
+      }
+      if t < T-1 {
         prob1 *= Q(X[t+1][j], 1, []int{X[t][j-1], X[t][j+1]})
         prob1 *= Q(X[t+1][j+1], X[t][j+1], []int{1, X[t][j+2]})
         prob1 *= Q(X[t+1][j-1], X[t][j-1], []int{1, X[t][j-2]})
-
-        var ratio float64
-        if X[t][j] == 0 {
-          ratio = prob1/prob0
-        } else {
-          ratio = prob0/prob1
-        }
-        if r.Float64() < ratio {
-          X[t][j] = 1-X[t][j]
-        }
-
       }
+
+      var ratio float64
+      if X[t][j] == 0 {
+        ratio = prob1/prob0
+      } else {
+        ratio = prob0/prob1
+      }
+      if r.Float64() < ratio {
+        X[t][j] = 1-X[t][j]
+      }
+
     }
     // Rotate
-    for t := 0; t < T; t++ {
-      X[t] = append([]int{X[t][n-1]}, X[t][:n-1]...)
+    if r.Float64() < 0.5 {
+      for t := 0; t < T; t++ {
+        X[t] = append(X[t][1:], X[t][0])
+      }
+    } else {
+      for t := 0; t < T; t++ {
+        X[t] = append([]int{X[t][n-1]}, X[t][:n-1]...)
+      }
     }
   }
 
