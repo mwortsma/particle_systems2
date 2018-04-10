@@ -51,7 +51,7 @@ func ER(n int, erp float64, seed int) Graph {
 		G[i] = make([]int, 0)
 	}
 	for i := 0; i < n; i++ {
-		for j := i+1; j < n; j++ {
+		for j := i + 1; j < n; j++ {
 			if r.Float64() < erp {
 				G[i] = append(G[i], j)
 				G[j] = append(G[j], i)

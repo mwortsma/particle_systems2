@@ -5,9 +5,9 @@ import (
 	"github.com/mwortsma/particle_systems2/full/fulltree"
 	"github.com/mwortsma/particle_systems2/local"
 	"github.com/mwortsma/particle_systems2/meanfield"
+	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"github.com/mwortsma/particle_systems2/util/matutil"
 	"github.com/mwortsma/particle_systems2/util/probutil"
-	"github.com/mwortsma/particle_systems2/util/graphutil"
 )
 
 // General.

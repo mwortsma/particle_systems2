@@ -7,8 +7,8 @@ import (
 	"github.com/mwortsma/particle_systems2/models/contact"
 	"github.com/mwortsma/particle_systems2/models/potts"
 	"github.com/mwortsma/particle_systems2/models/sir"
-	"github.com/mwortsma/particle_systems2/util/probutil"
 	"github.com/mwortsma/particle_systems2/util/graphutil"
+	"github.com/mwortsma/particle_systems2/util/probutil"
 	"io/ioutil"
 	"strings"
 )
@@ -41,7 +41,6 @@ func main() {
 	steps := flag.Int("steps", -1, "for estimating probability")
 	erp := flag.Float64("erp", 0.1, "random graph edge probability")
 	seed := flag.Int("seed", 10, "for shared random seed")
-
 
 	// Contact process
 	contact_graph_path := flag.Bool("contact_graph_path", false, "")
@@ -105,7 +104,7 @@ func main() {
 	}
 	init_f := probutil.GetInitFunc(init)
 
-	G := graphutil.GetGraph(graph,*n,*erp,*seed)
+	G := graphutil.GetGraph(graph, *n, *erp, *seed)
 
 	var distr probutil.Distr
 
