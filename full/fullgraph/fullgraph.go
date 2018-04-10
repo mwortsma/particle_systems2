@@ -97,3 +97,13 @@ func PathDistr(
 	}
 	return probutil.GetPathDistrSync(f, steps)
 }
+
+func GraphRealization(
+	T int,
+	Q probutil.RealTransition,
+	nu probutil.InitDistr,
+	k int,
+	G graphutil.Graph) probutil.Distr {
+
+	return Realization(T, Q, nu, k, G)
+}

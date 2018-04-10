@@ -76,6 +76,9 @@ if args.save_plot or args.show_plot:
 		plot.plot_time_full(distributions, labels, args.show_plot, args.save_plot, args.title)
 	elif args.type == 'time_gif':
 		plot.plot_time_gif(distributions, labels, args.show_plot, args.save_plot, args.title)
+	elif args.type == 'realization':
+		plot.plot_realization(distributions, labels, args.show_plot, args.save_plot, args.title)
+
 
 # Delete the files if keep=True
 if not args.keep:

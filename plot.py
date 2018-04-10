@@ -41,9 +41,11 @@ def plot_time(distributions, labels, show, save, title):
 		arr = np.array(d['Distr'])
 		for j in range(0,1):
 			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
-				label=(labels[i]+" P(X="+str(j))+")")
-	plt.legend(loc=2)
+				label=(labels[i]))
+	plt.legend(loc=1)
 	plt.xlabel("Time")
+	plt.ylabel("Probability that a Typical Partilce is Susceptible")
+	plt.ylim((0,1))
 	plt.title(title)
 	if show:
 		plt.show()
@@ -101,3 +103,24 @@ def plot_time_gif(distributions, labels, show, save, title):
 	anim = FuncAnimation(fig, update, frames=np.arange(0, total_iters), interval=200)
 	#plt.show()
 	anim.save('anim.gif', dpi=80, writer='imagemagick')
+
+def plot_realization(distributions, labels, show, save, title):
+	d = np.array(distributions[0]).T
+
+	ax1 = plt.subplot(211)
+	ax1.plot(sum(d==0), label='Susceptible', color='red')
+	ax1.plot(sum(d==1), label='Infected', color='blue')
+	ax1.plot(sum(d==2), label='Recovered', color='green')
+	ax1.set_xlabel('Time')
+	ax1.set_ylabel('Number of Particles')
+	ax1.legend()
+	ax1.set_title('SIR Process with a Complete Interaction Network')
+
+
+	ax2 = plt.subplot(212, sharex=ax1)
+	ax2.matshow(1-d, cmap=plt.cm.ocean)
+	plt.setp(ax2.get_xticklabels(), visible=False)
+	ax2.set_ylabel('Particle')
+	ax2.set
+
+	plt.show()

@@ -95,6 +95,15 @@ func GraphPathDistr(
 	return fullgraph.PathDistr(T, getRealQ(p, q), nu, 3, steps, G)
 }
 
+func GraphRealization(
+	T int,
+	p, q float64,
+	nu probutil.InitDistr,
+	G graphutil.Graph) probutil.Distr {
+
+	return fullgraph.GraphRealization(T, getRealQ(p, q), nu, 3, G)
+}
+
 // Tree
 func TreeFinalNeighborhoodDistr(
 	T int,

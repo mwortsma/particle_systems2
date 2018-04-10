@@ -39,7 +39,6 @@ func main() {
 	p := flag.Float64("p", 2.0/3.0, "infection rate")
 	q := flag.Float64("q", 1.0/3.0, "recovery rate")
 	steps := flag.Int("steps", -1, "for estimating probability")
-	tlim := flag.Int("tlim", 100, "for gibbs sampling")
 	erp := flag.Float64("erp", 0.1, "random graph edge probability")
 	seed := flag.Int("seed", 10, "for shared random seed")
 
@@ -61,14 +60,11 @@ func main() {
 	contact_meanfield_time := flag.Bool("contact_meanfield_time", false, "")
 	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
 
-	contact_gs_path := flag.Bool("contact_gs_path", false, "")
-	contact_gs_time := flag.Bool("contact_gs_time", false, "")
-	contact_gs_end := flag.Bool("contact_gs_end", false, "")
-
 	// SIR process
 	sir_graph_path := flag.Bool("sir_graph_path", false, "")
 	sir_graph_time := flag.Bool("sir_graph_time", false, "")
 	sir_graph_end := flag.Bool("sir_graph_end", false, "")
+	sir_graph_realization := flag.Bool("sir_graph_realization", false, "")
 
 	sir_tree_path := flag.Bool("sir_tree_path", false, "")
 	sir_tree_time := flag.Bool("sir_tree_time", false, "")
@@ -146,14 +142,6 @@ func main() {
 	case *contact_meanfield_end:
 		distr = contact.MeanFieldFinalNeighborhoodDistr(*T, *p, *q, init, *d)
 
-	case *contact_gs_path:
-		distr = contact.GSGraphPathDistr(*T, *p, *q, init, *steps, G, *tlim)
-	case *contact_gs_time:
-		distr = contact.GSGraphTimeDistr(*T, *p, *q, init, *steps, G, *tlim)
-	case *contact_gs_end:
-		distr = contact.GSGraphFinalNeighborhoodDistr(
-			*T, *p, *q, init, *steps, *d, G, *tlim)
-
 	// SIR Process
 	case *sir_graph_path:
 		distr = sir.GraphPathDistr(*T, *p, *q, init, *steps, G)
@@ -161,6 +149,8 @@ func main() {
 		distr = sir.GraphTimeDistr(*T, *p, *q, init, *steps, G)
 	case *sir_graph_end:
 		distr = sir.GraphFinalNeighborhoodDistr(*T, *p, *q, init, *steps, *d, G)
+	case *sir_graph_realization:
+		distr = sir.GraphRealization(*T, *p, *q, init, G)
 
 	case *sir_tree_path:
 		distr = sir.TreePathDistr(*T, *p, *q, *d, init, *steps, *depth)
