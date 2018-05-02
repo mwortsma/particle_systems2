@@ -50,10 +50,10 @@ def plot_time(distributions, labels, show, save, title):
 		for j in range(0,1):
 			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
 				label=(labels[i]))
-	plt.legend(loc=1)
+	plt.legend(loc=2)
 	plt.xlabel("Time")
 	#plt.ylabel("Probability that a Typical Partilce is Susceptible")
-	plt.ylim((0,1))
+	# plt.ylim((0,1))
 	plt.title(title)
 	if show:
 		plt.show()
