@@ -4,6 +4,7 @@ import (
 	"github.com/mwortsma/particle_systems2/full/fullgraph"
 	"github.com/mwortsma/particle_systems2/full/fulltree"
 	"github.com/mwortsma/particle_systems2/local"
+	"github.com/mwortsma/particle_systems2/pairapprox"
 	"github.com/mwortsma/particle_systems2/meanfield"
 	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"github.com/mwortsma/particle_systems2/util/matutil"
@@ -167,6 +168,37 @@ func LocalPathDistr(
 	nu probutil.InitFunc) probutil.PathDistr {
 
 	return local.PathDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+}
+
+// Pair Approx
+func PairapproxFinalNeighborhoodDistr(
+	T int,
+	tau int,
+	d int,
+	p, q float64,
+	nu probutil.InitFunc) probutil.PathDistr {
+
+	return pairapprox.FinalNeighborhoodDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+}
+
+func PairapproxTimeDistr(
+	T int,
+	tau int,
+	d int,
+	p, q float64,
+	nu probutil.InitFunc) probutil.TimeDistr {
+
+	return pairapprox.TimeDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
+}
+
+func PairapproxPathDistr(
+	T int,
+	tau int,
+	d int,
+	p, q float64,
+	nu probutil.InitFunc) probutil.PathDistr {
+
+	return pairapprox.PathDistr(T, tau, d, getNeighborQ(p, q), nu, 3)
 }
 
 // Mean Field

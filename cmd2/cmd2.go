@@ -55,6 +55,10 @@ func main() {
 	contact_local_time := flag.Bool("contact_local_time", false, "")
 	contact_local_end := flag.Bool("contact_local_end", false, "")
 
+	contact_pairapprox_path := flag.Bool("contact_pairapprox_path", false, "")
+	contact_pairapprox_time := flag.Bool("contact_pairapprox_time", false, "")
+	contact_pairapprox_end := flag.Bool("contact_pairapprox_end", false, "")
+
 	contact_meanfield_path := flag.Bool("contact_meanfield_path", false, "")
 	contact_meanfield_time := flag.Bool("contact_meanfield_time", false, "")
 	contact_meanfield_end := flag.Bool("contact_meanfield_end", false, "")
@@ -73,6 +77,10 @@ func main() {
 	sir_local_time := flag.Bool("sir_local_time", false, "")
 	sir_local_end := flag.Bool("sir_local_end", false, "")
 
+	sir_pairapprox_path := flag.Bool("sir_pairapprox_path", false, "")
+	sir_pairapprox_time := flag.Bool("sir_pairapprox_time", false, "")
+	sir_pairapprox_end := flag.Bool("sir_pairapprox_end", false, "")
+
 	sir_meanfield_path := flag.Bool("sir_meanfield_path", false, "")
 	sir_meanfield_time := flag.Bool("sir_meanfield_time", false, "")
 	sir_meanfield_end := flag.Bool("sir_meanfield_end", false, "")
@@ -88,6 +96,10 @@ func main() {
 	potts_local_path := flag.Bool("potts_local_path", false, "")
 	potts_local_time := flag.Bool("potts_local_time", false, "")
 	potts_local_end := flag.Bool("potts_local_end", false, "")
+
+	potts_pairapprox_path := flag.Bool("potts_pairapprox_path", false, "")
+	potts_pairapprox_time := flag.Bool("potts_pairapprox_time", false, "")
+	potts_pairapprox_end := flag.Bool("potts_pairapprox_end", false, "")
 
 	potts_meanfield_path := flag.Bool("potts_meanfield_path", false, "")
 	potts_meanfield_time := flag.Bool("potts_meanfield_time", false, "")
@@ -134,6 +146,13 @@ func main() {
 	case *contact_local_end:
 		distr = contact.LocalFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
 
+	case *contact_pairapprox_path:
+		distr = contact.PairapproxPathDistr(*T, *tau, *d, *p, *q, init_f)
+	case *contact_pairapprox_time:
+		distr = contact.PairapproxTimeDistr(*T, *tau, *d, *p, *q, init_f)
+	case *contact_pairapprox_end:
+		distr = contact.PairapproxFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
+
 	case *contact_meanfield_path:
 		distr = contact.MeanFieldPathDistr(*T, *p, *q, init)
 	case *contact_meanfield_time:
@@ -164,6 +183,13 @@ func main() {
 		distr = sir.LocalTimeDistr(*T, *tau, *d, *p, *q, init_f)
 	case *sir_local_end:
 		distr = sir.LocalFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
+
+	case *sir_pairapprox_path:
+		distr = sir.PairapproxPathDistr(*T, *tau, *d, *p, *q, init_f)
+	case *sir_pairapprox_time:
+		distr = sir.PairapproxTimeDistr(*T, *tau, *d, *p, *q, init_f)
+	case *sir_pairapprox_end:
+		distr = sir.PairapproxFinalNeighborhoodDistr(*T, *tau, *d, *p, *q, init_f)
 
 	case *sir_meanfield_path:
 		distr = sir.MeanFieldPathDistr(*T, *p, *q, init)
@@ -196,6 +222,14 @@ func main() {
 		distr = potts.LocalTimeDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
 	case *potts_local_end:
 		distr = potts.LocalFinalNeighborhoodDistr(
+			*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+
+	case *potts_pairapprox_path:
+		distr = potts.PairapproxPathDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+	case *potts_pairapprox_time:
+		distr = potts.PairapproxTimeDistr(*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
+	case *potts_pairapprox_end:
+		distr = potts.PairapproxFinalNeighborhoodDistr(
 			*T, *tau, *d, *k, *n, *beta, *J, *h, init_f)
 
 	case *potts_meanfield_path:

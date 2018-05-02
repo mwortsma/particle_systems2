@@ -12,6 +12,12 @@ def get_keys(distributions):
 				if k not in d2: d2[k] = 0
 	return sorted(distributions[0].keys())
 
+def safe_div(x,y):
+	if y == 0:
+		return 0
+	else:
+		return x/y
+
 def plot_path(distributions, labels, show, save, title):
 	keys = get_keys(distributions)
 	for i in range(len(distributions)):
@@ -26,12 +32,14 @@ def plot_path(distributions, labels, show, save, title):
 			print sum([abs(d1[k]-d2[k]) for k in keys])
 			print max([abs(d1[k]-d2[k]) for k in keys])
 	plt.legend(loc=2)
-	plt.xlabel("Possible Neighborhood States")
+	plt.xlabel("Possible Local Region States")
 	plt.ylabel("Probability")
 	if show:
 		plt.show()
 	if save and save != "":
 		plt.savefig(save)
+	for k in keys:
+		print "%s,%0.3f,%0.4f,%0.4f,%0.4f" % (str(k).replace(",", " ").replace("[", "").replace("]",""), distributions[0][k], safe_div(abs(distributions[1][k] - distributions[0][k]),distributions[0][k]), safe_div(abs(distributions[2][k] - distributions[0][k]),distributions[0][k]), safe_div(abs(distributions[3][k] - distributions[0][k]),distributions[0][k]))
 
 
 def plot_time(distributions, labels, show, save, title):
@@ -44,13 +52,25 @@ def plot_time(distributions, labels, show, save, title):
 				label=(labels[i]))
 	plt.legend(loc=1)
 	plt.xlabel("Time")
-	plt.ylabel("Probability that a Typical Partilce is Susceptible")
+	#plt.ylabel("Probability that a Typical Partilce is Susceptible")
 	plt.ylim((0,1))
 	plt.title(title)
 	if show:
 		plt.show()
 	if save and save != "":
 		plt.savefig(save)
+
+	d0 = distributions[0]
+	d0_distr = np.array(d0['Distr'])
+	d0_T =d0['T']
+	for i in range(0,d0_T):
+		arr = []
+		for k in range(1,len(distributions)):
+			d = np.array(distributions[k]['Distr'])
+			arr.append(abs(d0_distr[i,0] - d[i,0])/d0_distr[i,0])
+			#arr.append(abs(d[i,0]))
+		str_arr =  ["%.4f" % number for number in arr]
+		print "%d,%0.2f,%s" %(i,d0_distr[i,0],','.join(str_arr))
 
 
 def plot_time_full(distributions, labels, show, save, title):

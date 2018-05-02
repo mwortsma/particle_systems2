@@ -4,6 +4,7 @@ import (
 	"github.com/mwortsma/particle_systems2/full/gibbs"
 	"github.com/mwortsma/particle_systems2/full/mcmc"
 	"github.com/mwortsma/particle_systems2/local"
+	"github.com/mwortsma/particle_systems2/pairapprox"
 	"github.com/mwortsma/particle_systems2/meanfield"
 	"github.com/mwortsma/particle_systems2/util/graphutil"
 	"github.com/mwortsma/particle_systems2/util/matutil"
@@ -191,6 +192,41 @@ func LocalPathDistr(
 		getNeighborQ(n, d, k, beta, J, h),
 		nu, k)
 }
+
+// Pair Approx
+func PairapproxFinalNeighborhoodDistr(
+	T, tau, d, k, n int,
+	beta, J, h float64,
+	nu probutil.InitFunc) probutil.PathDistr {
+
+	return pairapprox.FinalNeighborhoodDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
+}
+
+func PairapproxTimeDistr(
+	T, tau, d, k, n int,
+	beta, J, h float64,
+	nu probutil.InitFunc) probutil.TimeDistr {
+
+	return pairapprox.TimeDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
+}
+
+func PairapproxPathDistr(
+	T, tau, d, k, n int,
+	beta, J, h float64,
+	nu probutil.InitFunc) probutil.PathDistr {
+
+	return pairapprox.PathDistr(
+		T, tau, d,
+		getNeighborQ(n, d, k, beta, J, h),
+		nu, k)
+}
+
 
 // Mean Field
 func MeanFieldFinalNeighborhoodDistr(

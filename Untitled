@@ -1,0 +1,70 @@
+python main.py  -commands="cmd2 -sir_tree_path -d=4 -steps=3000000 |\
+            cmd2 -sir_local_path  -d=2 |\
+            cmd2 -sir_meanfield_path" -shared="-T=4 -p=0.6 -q=0.3 -nu=[0.8,0.2,0.0]" -show_plot -type=path -labels="Full Simulation, Local Recursions, Mean Field Approx" -title="SIR Process"
+
+
+python main.py  -commands="cmd2 -contact_tree_path -d=3 -steps=3000000 |\
+cmd2 -contact_local_path -d=3 |\
+cmd2 -contact_meanfield_path" -shared="-T=5 -p=0.8 -q=0.1 -nu=[0.5,0.5]" -show_plot -type=path -labels="Full Simulation, Local Recursions, Mean Field Approx" -title="Contact Process"
+
+python main.py \
+ -commands="cmd2 -contact_graph_path -graph=ring -n=50 -steps=3000000 |\
+            cmd2 -contact_local_path  -d=2 |\
+            cmd2 -contact_meanfield_path"\
+ -shared="-T=4 -p=0.6 -q=0.3 -nu=[0.6,0.4]"\
+ -show_plot -type=path\
+ -labels="Full Simulation, Local Recursions, Mean Field Approx"\
+ -title="Contact Process"
+
+python main.py  -commands="cmd2 -sir_graph_time -graph=ring -n=120 -steps=10000 |\
+cmd2 -sir_local_time -tau=0 -d=2 |\
+cmd2 -sir_local_time -tau=1 -d=2 |\
+cmd2 -sir_meanfield_time" -shared="-T=50 -p=0.5 -q=0.1 -nu=[0.6,0.4,0.0]" -show_plot -type=time -labels="Full Simulation, Tau Approx (Tau=0), Tau Approx (Tau=1), Mean Field Approx" -title="Contact Process"
+
+
+############# commands
+
+res1:
+python main.py \
+  -commands="cmd2 -contact_graph_path -graph=ring -n=50 -steps=3000000 |\
+             cmd2 -contact_local_path  -d=2 |\
+             cmd2 -contact_meanfield_path"\
+  -shared="-T=4 -p=0.6 -q=0.3 -nu=[0.6,0.4]"\
+  -show_plot -type=path\
+  -labels="Full Simulation, Local Recursions, Mean Field Approx"\
+  -title="Contact Process"
+
+res2:
+python main.py  -commands="cmd2 -contact_tree_path -d=3 -steps=3000000 |\
+cmd2 -contact_local_path -d=3 |\
+cmd2 -contact_meanfield_path" \
+-shared="-T=5 -p=0.6 -q=0.3 -nu=[0.5,0.5]" \
+-show_plot -type=path \
+-labels="Full Simulation, Local Recursions, Mean Field Approx" -title="Contact Process"
+
+res3 (with tau=2):
+python main.py  -commands="cmd2 -sir_graph_time -graph=ring -n=120 -steps=10000 |\
+cmd2 -sir_local_time -tau=0 -d=2 |\
+cmd2 -sir_local_time -tau=1 -d=2 |\
+cmd2 -sir_local_time -tau=2 -d=2 |\
+cmd2 -sir_meanfield_time" -shared="-T=30 -p=0.5 -q=0.1 -nu=[0.7,0.3,0.0]" \
+-show_plot -type=time -labels="Full Simulation, Tau Approx (Tau=0), Tau Approx (Tau=1), Tau Approx (Tau=2), Mean Field Approx" -title="SIR Process"
+
+res3:
+python main.py  -commands="cmd2 -sir_graph_time -graph=ring -n=120 -steps=1000000 |\
+cmd2 -sir_local_time -tau=0 -d=2 |\
+cmd2 -sir_local_time -tau=1 -d=2 |\
+cmd2 -sir_meanfield_time" -shared="-T=30 -p=0.5 -q=0.1 -nu=[0.8,0.2,0.0]" -show_plot -type=time -labels="Full Simulation, Tau Approx (Tau=0), Tau Approx (Tau=1),  Mean Field Approx" -title="SIR Process"
+
+res4:
+python main.py  -commands="cmd2 -potts_gibbs_end |\
+cmd2 -potts_mcmc_end -graph=ring -steps=1000000 |\
+cmd2 -potts_local_end -tau=0 -d=2 |\
+cmd2 -potts_meanfield_end" -shared="-T=50 -d=2 -n=5 -beta=0.5 -nu=[0.3,0.3,0.4]" -show_plot \
+-labels="Gibbs Measure, MCMC, Tau Approx (Tau=0), Mean Field Approx"
+
+
+python main.py  -commands="cmd2 -potts_mcmc_end -graph=ring -steps=1000000 |\
+cmd2 -potts_local_end -tau=0 -d=2 |\
+cmd2 -potts_meanfield_end" -shared="-T=100 -d=2 -n=20 -beta=0.5 -nu=[0.3,0.3,0.4]" -show_plot \
+-labels="MCMC, Tau Approx (Tau=0), Mean Field Approx"
