@@ -43,13 +43,13 @@ def plot_path(distributions, labels, show, save, title):
 
 
 def plot_time(distributions, labels, show, save, title):
+	j = 2
 	for i in range(len(distributions)):
 		d = distributions[i]
 		k = d['K']
 		arr = np.array(d['Distr'])
-		for j in range(0,1):
-			plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
-				label=(labels[i]))
+		plt.plot(np.arange(0, len(arr[:,j])*d['Dt'],d['Dt']), arr[:,j],
+			label=(labels[i]))
 	plt.legend(loc=2)
 	plt.xlabel("Time")
 	#plt.ylabel("Probability that a Typical Partilce is Susceptible")
@@ -67,7 +67,7 @@ def plot_time(distributions, labels, show, save, title):
 		arr = []
 		for k in range(1,len(distributions)):
 			d = np.array(distributions[k]['Distr'])
-			arr.append(abs(d0_distr[i,0] - d[i,0])/d0_distr[i,0])
+			arr.append(abs(d0_distr[i,j] - d[i,j])/d0_distr[i,j])
 			#arr.append(abs(d[i,0]))
 		str_arr =  ["%.4f" % number for number in arr]
 		print "%d,%0.2f,%s" %(i,d0_distr[i,0],','.join(str_arr))
